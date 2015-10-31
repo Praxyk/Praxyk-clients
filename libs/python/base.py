@@ -9,7 +9,7 @@
 import os, sys, json, requests
 import subprocess, argparse, getpass
 import datetime as dt
-
+from praxyk_exception import PraxykException
 
 # @info - This is the base class for all other classes in the Praxyk python library.
 #         It serves to hold data and functions that are common to all classes of the 
@@ -97,5 +97,3 @@ class PraxykBase(object) :
             sys.stderr.write("Request Failed (DELETE) : Url (%s) | Payload (%s)" % (url, payload))
             return None
         return json.loads(r.text)
-
-        
