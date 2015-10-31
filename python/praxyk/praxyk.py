@@ -21,20 +21,35 @@ class PraxykException(Exception):
 		self.errors = errors
 
 
+def login(username=None, password=None):
+	if username and password:
+		try:
+			return requests.get('%s/users/' % PRAXYK_WEBSITE, auth=(username, password))
+		except Exception as e:
+			print 'Error verifying login credentials'
+			return
+	else:
+		print 'Username or password missing, only one supplied'
+
+
 class Praxyk:
-	def __init__(self, username=None, password=None, authok=None):
-		if username and password:
-			self.username = username
-			self.password = password
-			#attempt login, if it fails auth, raise an exception
-			response = requests.get('%s/users/' % PRAXYK_WEBSITE, auth=(username, password))
-			print 'response ', response
-			raise PraxykException(message='Could not confirm user authorization with given username/password combo or authorization token', praxyk_instance=self)
-		elif authtok:
-			self.authtok = authtok
-			# attempt login
-			# if not authorized:
-			raise PraxykException(message='Could not confirm user authorization with given username and password or authorization token', praxyk_instance=self)
-		else:
-			raise PraxykException(message='No username and password or authorization token present.\nIf you do not have a valid username and password or authorization token, refer to: %s\n' % PRAXYK_WEBSITE, praxyk_instance=self)
-	#def login():
+	class PraxykUser:
+		def __init__(self, username=None, password=None, authok=None):
+			if username and password:
+				self.username = username
+				self.password = password
+				#attempt login, if it fails auth, raise an exception
+				print 'response ', response
+				raise PraxykException(message='Could not confirm user authorization with given username/password combo or authorization token', praxyk_instance=self)
+			elif authtok:
+				self.authtok = authtok
+				# attempt login
+				# if not authorized:
+				raise PraxykException(message='Could not confirm user authorization with given username and password or authorization token', praxyk_instance=self)
+			else:
+				raise PraxykException(message='No username and password or authorization token present.\nIf you do not have a valid username and password or authorization token, refer to: %s\n' % PRAXYK_WEBSITE, praxyk_instance=self)
+		def get():
+
+		def update()
+	def __init__():
+
