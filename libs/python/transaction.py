@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python                                                                                                                                
 
 ## @auth John Allard, Nick Church, others
@@ -13,49 +14,54 @@ import datetime as dt
 from base import PraxykBase
 
 
-class Praxyk(PraxykBase) :
-    TOKENS_ROUTE = self.BASE_ROUTE + "tokens/"
-	USERS_ROUTE = self.BASE_ROUTE + "users/"
+# @info - This class represents a single Praxyk user and the actions that can be made that are directly
+#            related to each user. That means this class can be used to set user info then post that info to
+#          create a new user, or you can just set the user_id and auth_token and use the get() function to
+#          get all of the rest of the info on a user. Deletion a updates are also supported through put() and
+#          update()
+class Transaction(PraxykBase) :
 
-    # base headers
-    headers = {'content-type': 'application/json'}
+    def __init__(self, trans_id=None, name=None, user_id=None, status=None, created_at=None, finished_at=None,
+                 command_url=None, service=None, model=None, uploads_total=None, uploads_success=None,
+                 uploads_failed=None, size_total_kb=None, **kwargs)
+        super(Transaction, self).__init__(**kwargs)
+        self.name = name
+        self.user_id = user_id
+        self.created_at = created_at
+        self.finished = created_at
+        self.status = status
 
-    def __init__(self, auth_token="", email="", password="") :
-		super(Praxyk, self).__init__(auth_token, email, password)
+    def get(self) :
+        payload = {'token' : self.auth_token}
+        response = super(Transaction, self).get(self.TRANSACTIONS_ROUTE+str(self.trans_id), payload)
+        if response :
+            self.user = response['user']
+            self.transaction = response['transaction']
+            return self.user
+        return None
 
-		if auth_token or (email and password) :
-			if not self.login(auth_token=auth_token, email=email, password=password) :
-				sys.stderr.write("Could not Log-In, All Requests Will Fail Until You Log-In\n")
 
-	# @info - takes either an existing auth_token or an email and password and logs the user
-	# 		  in via the Praxyk api /tokens/ route. Will store the returned user info in
-	# 		  member variables that can be stored easily for later.
-    def login(self, auth_token="", email="", password="") :
-        if auth_token :
-            payload = {'token' : self.auth_token}
-            results = self.get(TOKENS_ROUTE, payload)
-            if results :
-                self.user = results['user']
-                self.user_id = self.user['user_id']
-                self.auth_token = results['token']
-                return True
-        if email and password :
-            payload = {'email' : email, 'password' : password}
-            results = self.post(TOKENS_ROUTE, payload)
-            if results :
-                self.user = results['user']
-                self.user_id = self.user['user_id']
-                self.auth_token = results['token']
-            return False
+    def to_dict(self) :
+        return {
+                'name' : self.name,
+                'status' : self.status,
+                'trans_id' : self.trans_id,
+                'user_id' : self.user_id,
+                'created_at' : self.created_at,
+                'finished_at' : self.finished_at,
+                'command_url' : self.command_url,
+                'service' : self.service,
+                'model' : self.model,
+                'uploads_total' : self.uploads_total,
+                'uploads_success' : self.uploads_success,
+                'uploads_faile' : self.uploads_failed,
+                'size_total_KB' : self.size_total_KB,
+                }
+    
 
-	# @info - returns information on a specific user, as returned through the /users/X route. If no name
-	#		  is given, the user that was logged in during construction is returned. If  a name is given
-	#		  that user is grabbed (note only admins can get info on other users)
-	@self.requires_auth
-	def get_user(self, user_id=None) :
-		if user_id=None :
-			user_id = self.user_id
-		payload = {'token' : self.token}
-		response = self.get(USERS_ROUTE+str(user_id), payload)
-		return results
-		
+
+    def to_json(self) :
+        return json.dumps(self.to_dict())
+    
+
+
