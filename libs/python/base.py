@@ -23,14 +23,17 @@ class PraxykBase(object) :
 
     def __init__(self, auth_token="", user=None, local=False, port=5000, **kwargs) :
         self.auth_token = auth_token
-        self.user = user # the dictionary containing all of the user's information 
-                         # (user as in caller, owner of the auth token)
+        self.caller = user # the dictionary containing all of the user's information 
+                           # (user as in caller, owner of the auth token)
+        self.local = local
+        self.port  = port
 
-        self.BASE_URL = "http://127.0.0.1:" + str(port) + "/" if local else "http://api.praxyk.com/"
+        self.BASE_URL = ("http://127.0.0.1:" + str(self.port) + "/") if self.local else "http://api.praxyk.com/"
         self.VERSION  = "v1/"
-        self.BASE_ROUTE = self.BASE_URL + self.VERSION
-        self.TOKENS_ROUTE = self.BASE_ROUTE + "tokens/"
-        self.USERS_ROUTE = self.BASE_ROUTE + "users/"
+        self.BASE_ROUTE         = self.BASE_URL + self.VERSION
+        self.TOKENS_ROUTE       = self.BASE_ROUTE + "tokens/"
+        self.USERS_ROUTE        = self.BASE_ROUTE + "users/"
+        self.TRANSACTIONS_ROUTE = self.BASE_ROUTE + "transactions/"
 
 
     # @info - simple helper wrapper function that can be used to ensure a function
@@ -46,14 +49,26 @@ class PraxykBase(object) :
             return f(*args, **kwargs)
         return decorated
 
+    # @info - takes the dictionary returned by self.to_dict and jsonifies it.
     def to_json(self) :
         return json.dumps(self.to_dict())
 
+    # @info - child classes should override this to return a dictionary containing the
+    #         relevant members and their values. AKA User.to_dict() should return 
+    #         {name : 'first last', email : 'who@areyou.com', token : 'lksjdlfkjsl;dkjfl;sajkd' ...}
     def to_dict(self) :
         return {
             'auth_token':self.auth_token,
+<<<<<<< HEAD
             'user':self.user,
         }
+=======
+            'caller':self.caller,
+        }
+
+    def __str__(self) :
+        return str(self.to_json())
+>>>>>>> 8cffd4ecdf8f977c4d5094e6d080092c3f458df2
 
 
     # @info - looks at the raw response and prints relevant error messages if necessary
