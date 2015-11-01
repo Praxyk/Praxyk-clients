@@ -11,6 +11,8 @@ import subprocess, argparse, getpass
 import datetime as dt
 from praxyk_exception import PraxykException
 from base import PraxykBase
+from transaction import Transaction
+from transactions import Transactions
 
 
 # @info - This class represents a single Praxyk user and the actions that can be made that are directly
@@ -36,15 +38,18 @@ class User(PraxykBase) :
     #         with data from the API
     def get(self) :
         payload = {'token' : self.auth_token}
-        response = super(User, self).get(self.USERS_ROUTE+str(self.user_id), payload)
-        if response :
-            self.caller = response['user']
-            self.user_id = self.caller['user_id']
-            self.name = self.caller['name']
-            self.email = self.caller['email']
-            self.created_at = self.caller['created_at']
-            self.active = self.caller['active']
-            return self.caller
+        try :
+            response = super(User, self).get(self.USERS_ROUTE+str(self.user_id), payload)
+            if response :
+                self.caller = response['user']
+                self.user_id = self.caller['user_id']
+                self.name = self.caller['name']
+                self.email = self.caller['email']
+                self.created_at = self.caller['created_at']
+                self.active = self.caller['active']
+                return self.caller
+        except Exception, e :
+            sys.stderr.write(str(e))
         return None
 
     # @info - create a new user with the user attributes defined as members of this class
@@ -52,16 +57,31 @@ class User(PraxykBase) :
         payload = { 'name' : self.name,
                     'email': self.email,
                     'password' : password}
-        response = super(User, self).post(self.USERS_ROUTE, payload)
-        if response :
-            self.caller = response['user']
-            self.user_id = self.caller['user_id']
-            self.name = self.caller['name']
-            self.email = self.caller['email']
-            self.created_at = self.caller['created_at']
-            self.active = self.caller['active']
-            return self.caller
+        try :
+            response = super(User, self).post(self.USERS_ROUTE, payload)
+            if response :
+                self.caller = response['user']
+                self.user_id = self.caller['user_id']
+                self.name = self.caller['name']
+                self.email = self.caller['email']
+                self.created_at = self.caller['created_at']
+                self.active = self.caller['active']
+                return self.caller
+        except Exception, e :
+            sys.stderr.write(str(e))
         return None
+
+	# @info -  This is convenient factory function for generating a Transaction object that is pre-loaded with the
+    #          information specific to this user, like the auth_token stored and the user_id associated with this object.
+    def transaction(self, *args, **kwargs) :
+        return Transaction(auth_token=self.auth_token, caller=self.caller, user_id=self.caller.get('user_id', None),
+                           local=self.local, port=self.port, *args, **kwargs)
+
+	# @info -  This is convenient factory function for generating a Transactions object that is pre-loaded with the
+    #          information specific to this user, like the auth_token stored and the user_id associated with this object.
+    def transactions(self, *args, **kwargs) :
+        return Transactions(auth_token=self.auth_token, caller=self.caller, user_id=self.caller.get('user_id', None),
+                           local=self.local, port=self.port, *args, **kwargs)
 
     def to_dict(self) :
         base_dict = super(User, self).to_dict()

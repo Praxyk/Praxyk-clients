@@ -13,6 +13,7 @@ from praxyk_exception import PraxykException
 from base import PraxykBase
 from user import User
 from transaction import Transaction
+from transactions import Transactions
 
 
 # @info - Main Praxyk class for the API. This class is used to manage one's account and perform 
@@ -27,7 +28,7 @@ class Praxyk(PraxykBase) :
         # if they gave the login flag and credentials, go ahead and login
         if login and (self.auth_token or (email and password)) :
             if not self.login(auth_token=self.auth_token, email=email, password=password) :
-                sys.stderr.write("Could not Log-In\n")
+                raise PraxykException(message="Could not Log-In")
 
     # @info - takes either an existing auth_token or an email and password and logs the user
     #           in via the Praxyk api /tokens/ route. Will store the returned user info in
@@ -46,31 +47,23 @@ class Praxyk(PraxykBase) :
             self.auth_token = results.get('token', None)
             return True
         else :
-            sys.stderr.write("Login With Auth-Token Failed.\n")
-            return False
+            raise PraxykException(message="Could not Log-In")
         return False
 
 	# @info - returns a praxyk.User object that will pre-contain the authorization key and routing
 	#		  info associated with this object. So instead of having to say user=praxyk.User(auth_token=xxx, ...),
 	#		  they can just say pr = Praxyk(email=xxx, password=yyy);user = pr.User();user.get(); print user.to_json()
     def user(self, *args, **kwargs) :
-        return User(auth_token=self.auth_token, user_id=self.caller.get('user_id', None), local=self.local, port=self.port, *args, **kwargs)
+        return User(auth_token=self.auth_token, caller=self.caller, user_id=self.caller.get('user_id', None),
+                    local=self.local, port=self.port, *args, **kwargs)
 
 	# @info - like the User function, this is a convenient factory class to instantiate a Transaction object with
 	#		  the base attributes (auth_token, user_id, port, routes, etc) pre-set with the values from this 
 	#		  existing object.
     def transaction(self, *args, **kwargs) :
-        return Transaction(auth_token=self.auth_token, user_id=self.caller.get('user_id', None), local=self.local, port=self.port, *args, **kwargs)
-    
+        return Transaction(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port, *args, **kwargs)
 
-    # @info - returns information on a specific user, as returned through the /users/X route. If no name
-    #          is given, the user that was logged in during construction is returned. If  a name is given
-    #          that user is grabbed (note only admins can get info on other users)
-    def get_user(self, user_id=None) :
-        if user_id == None :
-            user_id = self.caller.get('user_id', {})
-        payload = {'token' : self.auth_token}
-        response = self.get(self.USERS_ROUTE+str(user_id), payload)
-        if response :
-            return User(auth_token=self.auth_token, user=self.caller, **response['user'])
-        return None
+	# @info -  This is convenient factory function for generating a Transactions object that is pre-loaded with the
+    #          information specific to this user, like the auth_token stored and the user_id associated with this object.
+    def transactions(self, *args, **kwargs) :
+        return Transactions(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port, *args, **kwargs)

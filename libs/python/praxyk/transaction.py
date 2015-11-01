@@ -40,24 +40,32 @@ class Transaction(PraxykBase) :
 
     def get(self) :
         payload = {'token' : self.auth_token}
-        response = super(Transaction, self).get(self.TRANSACTIONS_ROUTE+str(self.trans_id), payload)
-        if response :
-            self.transaction = response['transaction']
-            self.trans_id = self.transaction.get('trans_id', None)
-            self.name = self.transaction.get('name', None)
-            self.user_id = self.transaction.get('user_id', None)
-            self.status = self.transaction.get('status', None)
-            self.created_at = self.transaction.get('created_at', None)
-            self.finished_at = self.transaction.get('finished_at', None)
-            self.command_url = self.transaction.get('command_url', None)
-            self.service = self.transaction.get('service', None)
-            self.model = self.transaction.get('model', None)
-            self.uploads_total = self.transaction.get('uploads_total', None)
-            self.uploads_success = self.transaction.get('uploads_success', None)
-            self.uploads_failed = self.transaction.get('uploads_failed', None)
-            self.size_total_KB = self.transaction.get('size_total_KB', None)
-            return self.transaction
-        return {}
+        try :
+            response = super(Transaction, self).get(self.TRANSACTIONS_ROUTE+str(self.trans_id), payload)
+            if response :
+                self.transaction = response['transaction']
+                self.trans_id = self.transaction.get('trans_id', None)
+                self.name = self.transaction.get('name', None)
+                self.user_id = self.transaction.get('user_id', None)
+                self.status = self.transaction.get('status', None)
+                self.created_at = self.transaction.get('created_at', None)
+                self.finished_at = self.transaction.get('finished_at', None)
+                self.command_url = self.transaction.get('command_url', None)
+                self.service = self.transaction.get('service', None)
+                self.model = self.transaction.get('model', None)
+                self.uploads_total = self.transaction.get('uploads_total', None)
+                self.uploads_success = self.transaction.get('uploads_success', None)
+                self.uploads_failed = self.transaction.get('uploads_failed', None)
+                self.size_total_KB = self.transaction.get('size_total_KB', None)
+                return self.transaction
+        except Exception, e :
+            sys.stderr.write(str(e))
+        return None
+
+    # @info - return the results object associated with this transction
+    def results(self, *args, **kwargs) :
+        pass
+    
 
 
     def to_dict(self) :
@@ -79,11 +87,4 @@ class Transaction(PraxykBase) :
                 }
         base_dict.update(transaction_dict)
         return base_dict
-    
-
-
-    def to_json(self) :
-        return json.dumps(self.to_dict())
-    
-
 
