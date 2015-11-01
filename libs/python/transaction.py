@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python                                                                                                                                
 
 ## @auth John Allard, Nick Church, others
@@ -42,7 +41,8 @@ class Transaction(PraxykBase) :
 
 
     def to_dict(self) :
-        return {
+        base_dict = super(self).to_dict()
+        transaction_dict = {
                 'name' : self.name,
                 'status' : self.status,
                 'trans_id' : self.trans_id,
@@ -57,6 +57,7 @@ class Transaction(PraxykBase) :
                 'uploads_faile' : self.uploads_failed,
                 'size_total_KB' : self.size_total_KB,
                 }
+        return base_dict.update(transaction_dict)
     
 
 

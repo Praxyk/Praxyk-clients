@@ -41,7 +41,7 @@ class PraxykBase(object) :
         @wraps(f)                                                                                                                                        
         def decorated(*args, **kwargs):
             if not self.auth_token :
-                sys.stderr.write("An auth token is required to call this function. Please login and try again.\n")
+                raise PraxykException(message="An auth token is required to call this function. Please login and try again.\n")
                 return False
             return f(*args, **kwargs)
         return decorated
@@ -50,22 +50,25 @@ class PraxykBase(object) :
         return json.dumps(self.to_dict())
 
     def to_dict(self) :
-        return {}
+        return {
+            'auth_token':self.auth_token,
+            'user':self.user,
+        }
 
 
     # @info - looks at the raw response and prints relevant error messages if necessary
     def check_return(self, r) :
         if not r or not r.text :
             if "404" in r.text :
-                sys.stderr.write("404 : Content Not Found.")
+                raise PraxykException(message="404 : Content Not Found.")
             elif "403" in r.text :
-                sys.stderr.write("403 : Unauthorized Request.")
+                raise PraxykException(message="403 : Unauthorized Request.")
             elif "400" in r.text :
-                sys.stderr.write("400 : Bad Request.")
+                raise PraxykException(message="400 : Bad Request.")
             elif "500" in r.text :
-                sys.stderr.write("500 : System Error (if you think this is a bug please tell the Praxyk team! (github.com/praxyk)")
+                raise PraxykException(message="500 : System Error (if you think this is a bug please tell the Praxyk team! (github.com/praxyk)")
             else :
-                sys.stderr.write("Request Could not be Fufilled.\nDetails : %s\n"%r.text)
+                raise PraxykException(message="Request Could not be Fufilled.\nDetails : %s\n"%r.text)
             return None
         else :
             return r
@@ -73,27 +76,23 @@ class PraxykBase(object) :
     def get(self, url, payload) :
         r = requests.get(url, data=json.dumps(payload), headers=self.headers)
         if not self.check_return(r) :
-            sys.stderr.write("Request Failed (GET) : Url (%s) | Payload (%s)" % (url, payload))
-            return None
+            raise PraxykException(message="Request Failed (GET) : Url (%s) | Payload (%s)" % (url, payload))
         return json.loads(r.text)
 
     def post(self, url, payload) :
         r = requests.post(url, data=json.dumps(payload), headers=self.headers)
         if not self.check_return(r) :
-            sys.stderr.write("Request Failed (POST) : Url (%s) | Payload (%s)" % (url, payload))
-            return None
+            raise PraxykException(message="Request Failed (POST) : Url (%s) | Payload (%s)" % (url, payload))
         return json.loads(r.text)
 
     def put(self, url, payload) :
         r = requests.put(url, data=json.dumps(payload), headers=self.headers)
         if not self.check_return(r) :
-            sys.stderr.write("Request Failed (PUT) : Url (%s) | Payload (%s)" % (url, payload))
-            return None
+            raise PraxykException("Request Failed (PUT) : Url (%s) | Payload (%s)" % (url, payload))
         return json.loads(r.text)
 
     def delete(self, url, payload) :
         r = requests.delete(url, data=json.dumps(payload), headers=self.headers)
         if not self.check_return(r) :
-            sys.stderr.write("Request Failed (DELETE) : Url (%s) | Payload (%s)" % (url, payload))
-            return None
+            raise PraxykException("Request Failed (DELETE) : Url (%s) | Payload (%s)" % (url, payload))
         return json.loads(r.text)
