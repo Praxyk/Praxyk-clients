@@ -61,7 +61,7 @@ class Transaction(PraxykBase) :
 
 
     def to_dict(self) :
-        base_dict = super(self).to_dict()
+        base_dict = super(Transaction, self).to_dict()
         transaction_dict = {
                 'name' : self.name,
                 'status' : self.status,
@@ -77,7 +77,8 @@ class Transaction(PraxykBase) :
                 'uploads_failed' : self.uploads_failed,
                 'size_total_KB' : self.size_total_KB,
                 }
-        return base_dict.update(transaction_dict)
+        base_dict.update(transaction_dict)
+        return base_dict
     
 
 

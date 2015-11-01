@@ -64,15 +64,14 @@ class User(PraxykBase) :
         return None
 
     def to_dict(self) :
-        if self.user_id :
-            return {
+        base_dict = super(User, self).to_dict()
+        user_dict = {
                     'name' : self.name,
                     'email' : self.email,
                     'active' : self.active,
                     'user_id' : self.user_id,
                     'created_at' : self.created_at
                     }
-        else :
-            sys.stderr.write("User has not been obtained or constructed yet (i.e. call get() to get the user or push() to create them)\n")
-            return {}
+        base_dict.update(user_dict)
+        return base_dict
     
