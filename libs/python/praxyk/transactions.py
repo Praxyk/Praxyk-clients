@@ -51,15 +51,15 @@ class Transactions(PraxykBase) :
         try :
             response = super(Transactions, self).get(self.TRANSACTIONS_ROUTE, payload)
             if response :
-                if self.pagination :
-                    self.transactions_raw = response['transactions']
-                else :
+                if response.get('page', None) :
                     self.transactions_raw = response['page']['transactions']
+                else :
+                    self.transactions_raw = response['transactions']
                 self.transactions = [Transaction(auth_token=self.auth_token, caller=self.caller, **trans) for trans in self.transactions_raw]
-                self.next_page_num = self.get_params_from_url(response.get('next_page', None)).get('page', None)
-                self.prev_page_num = self.get_params_from_url(response.get('prev_page', None)).get('page', None)
-                self.first_page_num = self.get_params_from_url(response.get('first_page', None)).get('page', None)
-                self.last_page_num = self.get_params_from_url(response.get('last_page', None)).get('page', None)
+                self.next_page_num = self.get_params_from_url(response.get('next_page', "")).get('page', None)
+                self.prev_page_num = self.get_params_from_url(response.get('prev_page', "")).get('page', None)
+                self.first_page_num = self.get_params_from_url(response.get('first_page', "")).get('page', None)
+                self.last_page_num = self.get_params_from_url(response.get('last_page', "")).get('page', None)
 
                 self.next_page_num = int(self.next_page_num[0]) if self.next_page_num else None
                 self.prev_page_num = int(self.prev_page_num[0]) if self.prev_page_num else None
@@ -72,11 +72,10 @@ class Transactions(PraxykBase) :
         return None
 
 
-
-    # @info - these next three functions can be used after a page of results has already been obtained via the get function.
-    #         When that function is called, the results returned contain links to the next page, first page, and last page
-    #         or the transactions. We store those page numbers and make them accessable via these functions, example
-    #         tr = Transactions(user_id=45); tr.get(); trans_1 = tr.transactions; tr.next_page(); trans_2 = tr.transactions
+    # @info - these next four functions can be used after a page of results has already been obtained via the get function.
+    #         When that function is called, the results returned contain links to the next page, prev page, first page,
+    #         and last page of the transactions. We store those page numbers and make them accessable via these functions, ex:
+    #         tr = Transactions(user_id=45, auth_token=XXXX); tr.get(); trans_1 = tr.transactions; tr.next_page(); trans_2 = tr.transactions
     def next_page(self) :
         payload = {'token' : self.auth_token}
         try :
