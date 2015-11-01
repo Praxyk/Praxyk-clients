@@ -38,13 +38,13 @@ class User(PraxykBase) :
         payload = {'token' : self.auth_token}
         response = super(User, self).get(self.USERS_ROUTE+str(self.user_id), payload)
         if response :
-            self.user = response['user']
-            self.user_id = self.user['user_id']
-            self.name = self.user['name']
-            self.email = self.user['email']
-            self.created_at = self.user['created_at']
-            self.active = self.user['active']
-            return self.user
+            self.caller = response['user']
+            self.user_id = self.caller['user_id']
+            self.name = self.caller['name']
+            self.email = self.caller['email']
+            self.created_at = self.caller['created_at']
+            self.active = self.caller['active']
+            return self.caller
         return None
 
     # @info - create a new user with the user attributes defined as members of this class
@@ -54,13 +54,13 @@ class User(PraxykBase) :
                     'password' : password}
         response = super(User, self).post(self.USERS_ROUTE, payload)
         if response :
-            self.user = response['user']
-            self.user_id = self.user['user_id']
-            self.name = self.user['name']
-            self.email = self.user['email']
-            self.created_at = self.user['created_at']
-            self.active = self.user['active']
-            return self.user
+            self.caller = response['user']
+            self.user_id = self.caller['user_id']
+            self.name = self.caller['name']
+            self.email = self.caller['email']
+            self.created_at = self.caller['created_at']
+            self.active = self.caller['active']
+            return self.caller
         return None
 
     def to_dict(self) :
