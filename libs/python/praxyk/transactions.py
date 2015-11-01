@@ -25,6 +25,7 @@ class Transactions(PraxykBase) :
         self.transactions = []
         self.transactions_raw = ""
         self.next_page_num = None
+        self.prev_page_num = None
         self.last_page_num = None
         self.first_page_num = None
         self.page_size = page_size
@@ -56,10 +57,12 @@ class Transactions(PraxykBase) :
                     self.transactions_raw = response['page']['transactions']
                 self.transactions = [Transaction(auth_token=self.auth_token, caller=self.caller, **trans) for trans in self.transactions_raw]
                 self.next_page_num = self.get_params_from_url(response.get('next_page', None)).get('page', None)
+                self.prev_page_num = self.get_params_from_url(response.get('prev_page', None)).get('page', None)
                 self.first_page_num = self.get_params_from_url(response.get('first_page', None)).get('page', None)
                 self.last_page_num = self.get_params_from_url(response.get('last_page', None)).get('page', None)
 
                 self.next_page_num = int(self.next_page_num[0]) if self.next_page_num else None
+                self.prev_page_num = int(self.prev_page_num[0]) if self.prev_page_num else None
                 self.first_page_num = int(self.first_page_num[0]) if self.first_page_num else None
                 self.last_page_num = int(self.last_page_num[0]) if self.last_page_num else None
                 self.page = response.get('page', {}).get('page_number', None)
@@ -79,6 +82,16 @@ class Transactions(PraxykBase) :
         try :
             if self.next_page_num:
                 self.page = int(self.next_page_num)
+                return self.get()
+        except Exception, e :
+            sys.stderr.write(str(e))
+        return None
+
+    def prev_page(self) :
+        payload = {'token' : self.auth_token}
+        try :
+            if self.prev_page_num:
+                self.page = int(self.prev_page_num)
                 return self.get()
         except Exception, e :
             sys.stderr.write(str(e))
@@ -123,6 +136,7 @@ class Transactions(PraxykBase) :
                 'pagination' : self.pagination,
                 'page_size' : self.page_size,
                 'next_page' : self.next_page_num,
+                'prev_page' : self.prev_page_num,
                 'last_page' : self.last_page_num,
                 'first_page' : self.first_page_num
                 }

@@ -14,15 +14,15 @@ from base import PraxykBase
 
 
 # @info - This class represents a single Praxyk user and the actions that can be made that are directly
-#            related to each user. That means this class can be used to set user info then post that info to
-#          create a new user, or you can just set the user_id and auth_token and use the get() function to
-#          get all of the rest of the info on a user. Deletion a updates are also supported through put() and
-#          update()
+#         related to each user. That means this class can be used to set user info then post that info to
+#         create a new user, or you can just set the user_id and auth_token and use the get() function to
+#         get all of the rest of the info on a user. Deletion a updates are also supported through put() and
+#         update()
 class Transaction(PraxykBase) :
 
-    def __init__(self, trans_id=None, name=None, user_id=None, status=None, created_at=None, finished_at=None,
-                 command_url=None, service=None, model=None, uploads_total=None, uploads_success=None,
-                 uploads_failed=None, size_total_KB=None, **kwargs) :
+    def __init__(self, trans_id=None, name=None, user_id=None, status=None, created_at=None,
+                 finished_at=None, command_url=None, service=None, model=None, uploads_total=None, 
+                 uploads_success=None, uploads_failed=None, size_total_KB=None, **kwargs) :
         super(Transaction, self).__init__(**kwargs)
         self.trans_id = trans_id
         self.name = name
@@ -39,9 +39,11 @@ class Transaction(PraxykBase) :
         self.size_total_KB = size_total_KB
 
     def get(self) :
+        if not self.trans_id : return None
         payload = {'token' : self.auth_token}
         try :
-            response = super(Transaction, self).get(self.TRANSACTIONS_ROUTE+str(self.trans_id), payload)
+            route = self.TRANSACTIONS_ROUTE+str(self.trans_id)
+            response = super(Transaction, self).get(route, payload)
             if response :
                 self.transaction = response['transaction']
                 self.trans_id = self.transaction.get('trans_id', None)

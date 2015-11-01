@@ -32,42 +32,39 @@ class Result(PraxykBase) :
         self.prediction = prediction
 
     def get(self) :
-        payload = {'token' : self.auth_token}
+        payload = {'token' : self.auth_token, page_size=1, page=self.item_number}
         try :
             response = super(Result, self).get(self.RESULTS_ROUTE+str(self.trans_id), payload)
             if response :
-                self.result 
-                self.trans_id = trans_id
-                self.user_id = user_id
-                self.status = status
-                self.created_at = created_at
-                self.finished_at = finished_at
-                self.size_KB = size_KB
-                self.item_name = item_name
-                self.item_number = item_number,
-                self.prediction = prediction
-                return self.transaction
+                page = response['page']
+                self.result = page.get('results', [])
+                if self.result and len(self.result) >= 1 :
+                    self.result = self.result[0]
+                    self.status = self.result.get('status', None)
+                    self.created_at = self.result.get('created_at', None)
+                    self.finished_at = self.result.get('finished_at', None)
+                    self.size_KB = self.result.get('size_KB', None)
+                    self.item_name = self.result.get('item_name', None)
+                    self.item_number = self.result.get('item_number', None)
+                    self.prediction = self.result.get('prediction', None)
+                    return self.transaction
         except Exception, e :
             sys.stderr.write(str(e))
         return None
 
 
     def to_dict(self) :
-        base_dict = super(Transaction, self).to_dict()
-        transaction_dict = {
-                'name' : self.name,
+        base_dict = super(Result, self).to_dict()
+        result_dict = {
                 'status' : self.status,
                 'trans_id' : self.trans_id,
                 'user_id' : self.user_id,
                 'created_at' : self.created_at,
                 'finished_at' : self.finished_at,
-                'command_url' : self.command_url,
-                'service' : self.service,
-                'model' : self.model,
-                'uploads_total' : self.uploads_total,
-                'uploads_success' : self.uploads_success,
-                'uploads_failed' : self.uploads_failed,
-                'size_total_KB' : self.size_total_KB,
+                'size_KB' : self.size_KB,
+                'item_name' : self.item_name,
+                'item_number' : self.item_number,
+                'prediction' : self.prediction
                 }
         base_dict.update(transaction_dict)
         return base_dict
