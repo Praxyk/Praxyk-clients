@@ -59,11 +59,16 @@ class PraxykBase(object) :
     def to_dict(self) :
         return {
             'auth_token':self.auth_token,
+<<<<<<< HEAD
+            'user':self.user,
+        }
+=======
             'caller':self.caller,
         }
 
     def __str__(self) :
         return str(self.to_json())
+>>>>>>> 8cffd4ecdf8f977c4d5094e6d080092c3f458df2
 
 
     # @info - looks at the raw response and prints relevant error messages if necessary
