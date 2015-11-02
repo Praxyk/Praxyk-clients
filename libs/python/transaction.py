@@ -86,28 +86,28 @@ class Transaction(PraxykBase) :
                 raise PraxykException('Error with response received from call to \'put\', updating transaction \'%s\'' % trans_id, errors=response)
 
     def to_dict(self) :
-        base_dict = super(Transaction, self).to_dict()
-        transaction_dict = {
-                'name' : self.name,
-                'status' : self.status,
-                'trans_id' : self.trans_id,
-                'user_id' : self.user_id,
-                'created_at' : self.created_at,
-                'finished_at' : self.finished_at,
-                'command_url' : self.command_url,
-                'service' : self.service,
-                'model' : self.model,
-                'uploads_total' : self.uploads_total,
-                'uploads_success' : self.uploads_success,
-                'uploads_failed' : self.uploads_failed,
-                'size_total_KB' : self.size_total_KB,
-        }
-        base_dict.update(transaction_dict)
-        return base_dict
+        try:
+            base_dict = super(Transaction, self).to_dict()
+            transaction_dict = {
+                    'name' : self.name,
+                    'status' : self.status,
+                    'trans_id' : self.trans_id,
+                    'user_id' : self.user_id,
+                    'created_at' : self.created_at,
+                    'finished_at' : self.finished_at,
+                    'command_url' : self.command_url,
+                    'service' : self.service,
+                    'model' : self.model,
+                    'uploads_total' : self.uploads_total,
+                    'uploads_success' : self.uploads_success,
+                    'uploads_failed' : self.uploads_failed,
+                    'size_total_KB' : self.size_total_KB,
+            }
+            base_dict.update(transaction_dict)
+            return base_dict
+        except:
+            raise PraxykException('Error converting transaction to dictionary in call to \'to_dict\'', errors=self)
 
 
     def to_json(self) :
         return json.dumps(self.to_dict())
-    
-
-
