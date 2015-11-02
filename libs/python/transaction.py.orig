@@ -42,51 +42,30 @@ class Transaction(PraxykBase) :
         payload = {'token' : self.auth_token}
         response = super(Transaction, self).get(self.TRANSACTIONS_ROUTE+str(self.trans_id), payload)
         if response :
-            try:
-                self.transaction = response['transaction']
-                self.trans_id = self.transaction.get('trans_id', None)
-                self.name = self.transaction.get('name', None)
-                self.user_id = self.transaction.get('user_id', None)
-                self.status = self.transaction.get('status', None)
-                self.created_at = self.transaction.get('created_at', None)
-                self.finished_at = self.transaction.get('finished_at', None)
-                self.command_url = self.transaction.get('command_url', None)
-                self.service = self.transaction.get('service', None)
-                self.model = self.transaction.get('model', None)
-                self.uploads_total = self.transaction.get('uploads_total', None)
-                self.uploads_success = self.transaction.get('uploads_success', None)
-                self.uploads_failed = self.transaction.get('uploads_failed', None)
-                self.size_total_KB = self.transaction.get('size_total_KB', None)
-                return self.transaction
-            except:
-                raise PraxykException('Error: malformed response from GET request for transaction \'%s\'. Unable to load result dictionary' % self.trans_id, errors=response)
+            self.transaction = response['transaction']
+            self.trans_id = self.transaction.get('trans_id', None)
+            self.name = self.transaction.get('name', None)
+            self.user_id = self.transaction.get('user_id', None)
+            self.status = self.transaction.get('status', None)
+            self.created_at = self.transaction.get('created_at', None)
+            self.finished_at = self.transaction.get('finished_at', None)
+            self.command_url = self.transaction.get('command_url', None)
+            self.service = self.transaction.get('service', None)
+            self.model = self.transaction.get('model', None)
+            self.uploads_total = self.transaction.get('uploads_total', None)
+            self.uploads_success = self.transaction.get('uploads_success', None)
+            self.uploads_failed = self.transaction.get('uploads_failed', None)
+            self.size_total_KB = self.transaction.get('size_total_KB', None)
+            return self.transaction
         return {}
 
-    def put(cancel=False):
-        if self.trans_id and cancel:
-            try:
-                payload = {'token' : self.auth_token, 'cancel' : cancel}
-                response = super(Transaction, self).put(self.TRANSACTIONS_ROUTE+str(self.trans_id), payload)
-                if response:
-                    self.transaction = response['transaction']
-                    self.trans_id = self.transaction.get('trans_id', None)
-                    self.command_url = self.transaction.get('command_url', None)
-                    self.data_url = self.transaction.get('data_url', None)
-                    self.results_url = self.transaction.get('results_url', None)
-                    self.status = self.transaction.get('status', None
-                    self.service = self.transaction.get('service', None)
-                    self.model = self.transaction.get('model', None)
-                    self.created_at = self.transaction.get('created_at', None)
-                    self.uploads_total = self.transaction.get('uploads_total', None)
-                    self.uploads_success = self.transaction.get('uploads_success', None)
-                    self.uploads_failed = self.transaction.get('uploads_failed', None)
-                    self.size_total_KB = self.transaction.get('size_total_KB', None)
-                    return self.transaction
-            except:
-                raise PraxykException('Error with response received from call to \'put\', updating transaction \'%s\'' % trans_id, errors=response)
 
     def to_dict(self) :
+<<<<<<< HEAD
+        base_dict = super(self).to_dict()
+=======
         base_dict = super(Transaction, self).to_dict()
+>>>>>>> 8cffd4ecdf8f977c4d5094e6d080092c3f458df2
         transaction_dict = {
                 'name' : self.name,
                 'status' : self.status,
@@ -101,9 +80,14 @@ class Transaction(PraxykBase) :
                 'uploads_success' : self.uploads_success,
                 'uploads_failed' : self.uploads_failed,
                 'size_total_KB' : self.size_total_KB,
-        }
+                }
+<<<<<<< HEAD
+        return base_dict.update(transaction_dict)
+=======
         base_dict.update(transaction_dict)
         return base_dict
+>>>>>>> 8cffd4ecdf8f977c4d5094e6d080092c3f458df2
+    
 
 
     def to_json(self) :
