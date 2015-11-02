@@ -10,6 +10,7 @@ import os, sys, json, requests
 import subprocess, argparse, getpass
 import datetime as dt
 from praxyk_exception import PraxykException
+import urlparse
 
 # @info - This is the base class for all other classes in the Praxyk python library.
 #         It serves to hold data and functions that are common to all classes of the 
@@ -21,9 +22,9 @@ class PraxykBase(object) :
     # base headers, child classes can add to these
     headers = {'content-type': 'application/json'}
 
-    def __init__(self, auth_token="", user=None, local=False, port=5000, **kwargs) :
+    def __init__(self, auth_token="", caller=None, local=False, port=5000, **kwargs) :
         self.auth_token = auth_token
-        self.caller = user # the dictionary containing all of the user's information 
+        self.caller = caller# the dictionary containing all of the user's information 
                            # (user as in caller, owner of the auth token)
         self.local = local
         self.port  = port
@@ -34,11 +35,13 @@ class PraxykBase(object) :
         self.TOKENS_ROUTE       = self.BASE_ROUTE + "tokens/"
         self.USERS_ROUTE        = self.BASE_ROUTE + "users/"
         self.TRANSACTIONS_ROUTE = self.BASE_ROUTE + "transactions/"
+        self.RESULTS_ROUTE      = self.BASE_ROUTE + "results/"
 
 
     # @info - simple helper wrapper function that can be used to ensure a function
     #           is only called if the self.auth_token is not Null, if it is this function
     #          will print a simple error message letting the user know
+    # @TODO - This isn't used, either get rid of it or figure out how to use it
     @staticmethod
     def requires_auth(f):
         @wraps(f)                                                                                                                                        
@@ -53,9 +56,8 @@ class PraxykBase(object) :
     def to_json(self) :
         return json.dumps(self.to_dict())
 
-    # @info - child classes should override this to return a dictionary containing the
-    #         relevant members and their values. AKA User.to_dict() should return 
-    #         {name : 'first last', email : 'who@areyou.com', token : 'lksjdlfkjsl;dkjfl;sajkd' ...}
+    # @info - child classes should call this first (via super()), then add their own key/vals 
+    #         to the dictionary returned and return that to the user. See praxyk.User for ex.
     def to_dict(self) :
         return {
             'auth_token':self.auth_token,
@@ -63,7 +65,14 @@ class PraxykBase(object) :
         }
 
     def __str__(self) :
-        return str(self.to_json())
+        return str(self.to_dict())
+
+    # @info - takes a url like api.praxyk.com/transactions?page=3&page_size=12 and returns
+    #         {'page' : 3, 'page_size' : 12}
+    def get_params_from_url(self, url) :
+        query_raw = urlparse.urlparse(url).query
+        query_dict = urlparse.parse_qs(query_raw)
+        return query_dict
 
 
     # @info - looks at the raw response and prints relevant error messages if necessary

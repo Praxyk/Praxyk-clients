@@ -14,15 +14,15 @@ from base import PraxykBase
 
 
 # @info - This class represents a single Praxyk user and the actions that can be made that are directly
-#            related to each user. That means this class can be used to set user info then post that info to
-#          create a new user, or you can just set the user_id and auth_token and use the get() function to
-#          get all of the rest of the info on a user. Deletion a updates are also supported through put() and
-#          update()
+#         related to each user. That means this class can be used to set user info then post that info to
+#         create a new user, or you can just set the user_id and auth_token and use the get() function to
+#         get all of the rest of the info on a user. Deletion a updates are also supported through put() and
+#         update()
 class Transaction(PraxykBase) :
 
-    def __init__(self, trans_id=None, name=None, user_id=None, status=None, created_at=None, finished_at=None,
-                 command_url=None, service=None, model=None, uploads_total=None, uploads_success=None,
-                 uploads_failed=None, size_total_KB=None, **kwargs) :
+    def __init__(self, trans_id=None, name=None, user_id=None, status=None, created_at=None,
+                 finished_at=None, command_url=None, service=None, model=None, uploads_total=None, 
+                 uploads_success=None, uploads_failed=None, size_total_KB=None, **kwargs) :
         super(Transaction, self).__init__(**kwargs)
         self.trans_id = trans_id
         self.name = name
@@ -39,10 +39,12 @@ class Transaction(PraxykBase) :
         self.size_total_KB = size_total_KB
 
     def get(self) :
+        if not self.trans_id : return None
         payload = {'token' : self.auth_token}
-        response = super(Transaction, self).get(self.TRANSACTIONS_ROUTE+str(self.trans_id), payload)
-        if response :
-            try:
+        try :
+            route = self.TRANSACTIONS_ROUTE+str(self.trans_id)
+            response = super(Transaction, self).get(route, payload)
+            if response :
                 self.transaction = response['transaction']
                 self.trans_id = self.transaction.get('trans_id', None)
                 self.name = self.transaction.get('name', None)
@@ -58,9 +60,14 @@ class Transaction(PraxykBase) :
                 self.uploads_failed = self.transaction.get('uploads_failed', None)
                 self.size_total_KB = self.transaction.get('size_total_KB', None)
                 return self.transaction
-            except:
+
+            except Exception as e:
                 raise PraxykException('Error: malformed response from GET request for transaction \'%s\'. Unable to load result dictionary' % self.trans_id, errors=response)
         return {}
+
+    # @info - return the results object associated with this transction
+    def results(self, *args, **kwargs) :
+        pass
 
     def put(cancel=False):
         if self.trans_id and cancel:
@@ -105,9 +112,5 @@ class Transaction(PraxykBase) :
             }
             base_dict.update(transaction_dict)
             return base_dict
-        except:
+        except Exception as e:
             raise PraxykException('Error converting transaction to dictionary in call to \'to_dict\'', errors=self)
-
-
-    def to_json(self) :
-        return json.dumps(self.to_dict())
