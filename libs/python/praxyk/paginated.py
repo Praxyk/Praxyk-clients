@@ -18,7 +18,7 @@ from base import PraxykBase
 #         and functions for return error checking. We also hold user auth info
 class Paginated(PraxykBase) :
 
-    def __init__(self, pagination=None, first_page_num=None, last_page_num=None, 
+    def __init__(self, pagination=None, first_page_num=None, last_page_num=None, page=None,
                  prev_page_num=None, next_page_num=None, page_size=None, **kwargs) :
         
         super(Paginated, self).__init__(**kwargs)
@@ -28,14 +28,100 @@ class Paginated(PraxykBase) :
         self.first_page_num = first_page_num
         self.page_size = page_size
         self.pagination = pagination
+        self.page = page
 
 
+    def get(self, url, payload, pagination=None, page_size=None, page=None) :
 
-    # @info - child classes should call this first (via super()), then add their own key/vals 
-    #         to the dictionary returned and return that to the user. See praxyk.User for ex.
+        if pagination : self.pagination = pagination
+        if page_size  : self.page_size = page_size
+        if page       : self.page = page
+
+        if self.page_size  : payload['page_size'] = self.page_size
+        if self.page       : payload['page'] = self.page
+        if self.pagination : payload['pagination'] = self.pagination
+        try :
+            response = super(Paginated, self).get(url, payload)  
+            if response :
+                self.next_page_num = self.get_params_from_url(response.get('next_page', "")).get('page', None)
+                self.prev_page_num = self.get_params_from_url(response.get('prev_page', "")).get('page', None)
+                self.first_page_num = self.get_params_from_url(response.get('first_page', "")).get('page', None)
+                self.last_page_num = self.get_params_from_url(response.get('last_page', "")).get('page', None)
+
+                self.next_page_num = int(self.next_page_num[0]) if self.next_page_num else None
+                self.prev_page_num = int(self.prev_page_num[0]) if self.prev_page_num else None
+                self.first_page_num = int(self.first_page_num[0]) if self.first_page_num else None
+                self.last_page_num = int(self.last_page_num[0]) if self.last_page_num else None
+                self.page = response.get('page', {}).get('page_number', page)
+                
+                return response
+        except Exception as e :
+            print str(e)
+            raise PraxykException(message="GET Request Failed in Paginated Class. URL (%s)" % url)
+        return None
+
+
+    # @info - these next four functions can be used after a page of results has already been obtained via the get function.                          
+    #         When that function is called, the results returned contain links to the next page, prev page, first page,
+    #         and last page of the transactions. We store those page numbers and make them accessable via these functions, ex:
+    #         tr = Transactions(user_id=45, auth_token=XXXX); tr.get(); trans_1 = tr.transactions; tr.next_page(); trans_2 = tr.transactions
+    def next_page(self) :
+        payload = {'token' : self.auth_token}
+        try :
+            if self.next_page_num:
+                self.page = int(self.next_page_num)
+                self.pagination = True
+                return self.get()
+        except Exception as e :
+            sys.stderr.write(str(e))
+        return None
+
+    def prev_page(self) :
+        payload = {'token' : self.auth_token}
+        try :
+            if self.prev_page_num:
+                self.page = int(self.prev_page_num)
+                self.pagination = True
+                return self.get()
+        except Exception as e :
+            sys.stderr.write(str(e))
+        return None
+
+    def last_page(self) :
+        payload = {'token' : self.auth_token}
+        try :
+            if self.last_page_num:
+                self.page = int(self.last_page_num)
+                self.pagination = True
+                return self.get()
+        except Exception as e :
+            sys.stderr.write(str(e))
+        return None
+
+    def first_page(self) :
+        payload = {'token' : self.auth_token}
+        try :
+            if self.first_page_num :
+                self.page = int(self.first_page_num)
+                self.pagination = True
+                return self.get()
+        except Exception as e :
+            sys.stderr.write(str(e))
+        return None
+
+
     def to_dict(self) :
-        return {
-            'auth_token':self.auth_token,
-            'caller':self.caller,
-        }
+        base_dict = super(Paginated, self).to_dict()
+        updated  = {
+                'page' : self.page,
+                'pagination' : self.pagination,
+                'page_size' : self.page_size,
+                'next_page' : self.next_page_num,
+                'prev_page' : self.prev_page_num,
+                'last_page' : self.last_page_num,
+                'first_page' : self.first_page_num
+                }
+        base_dict.update(updated)
+        return base_dict
+
 

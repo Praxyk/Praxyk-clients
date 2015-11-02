@@ -11,6 +11,7 @@ import subprocess, argparse, getpass
 import datetime as dt
 from praxyk_exception import PraxykException
 from base import PraxykBase
+from results import Results
 
 
 # @info - This class represents a single Praxyk user and the actions that can be made that are directly
@@ -67,7 +68,8 @@ class Transaction(PraxykBase) :
 
     # @info - return the results object associated with this transction
     def results(self, *args, **kwargs) :
-        pass
+        return Results(auth_token=self.auth_token, caller=self.caller, trans_id=self.trans_id, 
+                       local=self.local, port=self.port, *args, **kwargs)
 
     def put(cancel=False):
         if self.trans_id and cancel:

@@ -19,7 +19,7 @@ from base import PraxykBase
 class Result(PraxykBase) :
 
     def __init__(self, trans_id=None, user_id=None, status=None, created_at=None, finished_at=None,
-                 item_name=None, item_number=None, size_KB=None, prediction=None)
+                 item_name=None, item_number=None, size_KB=None, prediction=None) :
         super(Result, self).__init__(**kwargs)
         self.trans_id = trans_id
         self.user_id = user_id
@@ -32,7 +32,7 @@ class Result(PraxykBase) :
         self.prediction = prediction
 
     def get(self) :
-        payload = {'token' : self.auth_token, page_size=1, page=self.item_number}
+        payload = {'token' : self.auth_token, page_size : 1, page : self.item_number}
         try :
             response = super(Result, self).get(self.RESULTS_ROUTE+str(self.trans_id), payload)
             if response :
