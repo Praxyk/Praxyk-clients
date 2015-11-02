@@ -52,9 +52,10 @@ class Transactions(PraxykBase) :
             response = super(Transactions, self).get(self.TRANSACTIONS_ROUTE, payload)
             if response :
                 if response.get('page', None) :
-                    self.transactions_raw = response['page']['transactions']
+                    self.transactions_raw = response['page'].get('transactions', None)
                 else :
-                    self.transactions_raw = response['transactions']
+                    self.transactions_raw = response.get('transactions', None)
+                if not self.transactions_raw : return None
                 self.transactions = [Transaction(auth_token=self.auth_token, caller=self.caller, **trans) for trans in self.transactions_raw]
                 self.next_page_num = self.get_params_from_url(response.get('next_page', "")).get('page', None)
                 self.prev_page_num = self.get_params_from_url(response.get('prev_page', "")).get('page', None)
@@ -67,7 +68,7 @@ class Transactions(PraxykBase) :
                 self.last_page_num = int(self.last_page_num[0]) if self.last_page_num else None
                 self.page = response.get('page', {}).get('page_number', None)
                 return self.transactions_raw
-        except Exception, e :
+        except Exception as e :
             sys.stderr.write(str(e))
         return None
 
@@ -81,8 +82,9 @@ class Transactions(PraxykBase) :
         try :
             if self.next_page_num:
                 self.page = int(self.next_page_num)
+                self.pagination = True
                 return self.get()
-        except Exception, e :
+        except Exception as e :
             sys.stderr.write(str(e))
         return None
 
@@ -91,8 +93,9 @@ class Transactions(PraxykBase) :
         try :
             if self.prev_page_num:
                 self.page = int(self.prev_page_num)
+                self.pagination = True
                 return self.get()
-        except Exception, e :
+        except Exception as e :
             sys.stderr.write(str(e))
         return None
 
@@ -101,9 +104,9 @@ class Transactions(PraxykBase) :
         try :
             if self.last_page_num:
                 self.page = int(self.last_page_num)
-                # self.pagination = True
+                self.pagination = True
                 return self.get()
-        except Exception, e :
+        except Exception as e :
             sys.stderr.write(str(e))
         return None
 
@@ -112,9 +115,9 @@ class Transactions(PraxykBase) :
         try :
             if self.first_page_num :
                 self.page = int(self.first_page_num)
-                # self.pagination = True
+                self.pagination = True
                 return self.get()
-        except Exception, e :
+        except Exception as e :
             sys.stderr.write(str(e))
         return None
 

@@ -16,10 +16,10 @@ from transactions import Transactions
 
 
 # @info - This class represents a single Praxyk user and the actions that can be made that are directly
-#            related to each user. That means this class can be used to set user info then post that info to
-#          create a new user, or you can just set the user_id and auth_token and use the get() function to
-#          get all of the rest of the info on a user. Deletion a updates are also supported through put() and
-#          update()
+#         related to each user. That means this class can be used to set user info then post that info to
+#         create a new user, or you can just set the user_id and auth_token and use the get() function to
+#         get all of the rest of the info on a user. 
+#         Deletions and updates are also supported through put() and delete()
 class User(PraxykBase) :
 
     def __init__(self, name=None, user_id=None, email=None, active=None, created_at=None, **kwargs) :
@@ -48,7 +48,7 @@ class User(PraxykBase) :
                 self.created_at = self.caller['created_at']
                 self.active = self.caller['active']
                 return self.caller
-        except Exception, e :
+        except Exception as e :
             sys.stderr.write(str(e))
         return None
 
@@ -67,7 +67,7 @@ class User(PraxykBase) :
                 self.created_at = self.caller['created_at']
                 self.active = self.caller['active']
                 return self.caller
-        except Exception, e :
+        except Exception as e :
             sys.stderr.write(str(e))
         return None
 

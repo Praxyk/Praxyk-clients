@@ -26,9 +26,10 @@ class Praxyk(PraxykBase) :
         super(Praxyk, self).__init__(*args, **kwargs)
 
         # if they gave the login flag and credentials, go ahead and login
+        # note that self.login throws an exception upon failure so this will propogate
+        # the exception out of the constructor
         if login and (self.auth_token or (email and password)) :
-            if not self.login(auth_token=self.auth_token, email=email, password=password) :
-                raise PraxykException(message="Could not Log-In")
+            self.login(auth_token=self.auth_token, email=email, password=password)
 
     # @info - takes either an existing auth_token or an email and password and logs the user
     #           in via the Praxyk api /tokens/ route. Will store the returned user info in

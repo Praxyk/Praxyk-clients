@@ -61,8 +61,8 @@ class Transaction(PraxykBase) :
                 self.size_total_KB = self.transaction.get('size_total_KB', None)
                 return self.transaction
 
-            except Exception as e:
-                raise PraxykException('Error: malformed response from GET request for transaction \'%s\'. Unable to load result dictionary' % self.trans_id, errors=response)
+        except Exception as e:
+            raise PraxykException('Error: malformed response from GET request for transaction \'%s\'. Unable to load result dictionary' % self.trans_id, errors=response)
         return {}
 
     # @info - return the results object associated with this transction
@@ -80,7 +80,7 @@ class Transaction(PraxykBase) :
                     self.command_url = self.transaction.get('command_url', None)
                     self.data_url = self.transaction.get('data_url', None)
                     self.results_url = self.transaction.get('results_url', None)
-                    self.status = self.transaction.get('status', None
+                    self.status = self.transaction.get('status', None)
                     self.service = self.transaction.get('service', None)
                     self.model = self.transaction.get('model', None)
                     self.created_at = self.transaction.get('created_at', None)
