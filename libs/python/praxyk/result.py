@@ -19,8 +19,8 @@ from base import PraxykBase
 class Result(PraxykBase) :
 
     def __init__(self, trans_id=None, user_id=None, status=None, created_at=None, finished_at=None,
-                 item_name=None, item_number=None, size_KB=None, prediction=None) :
-        super(Result, self).__init__(**kwargs)
+                 item_name=None, item_number=None, size_KB=None, prediction=None, *args, **kwargs) :
+        super(Result, self).__init__(*args, **kwargs)
         self.trans_id = trans_id
         self.user_id = user_id
         self.status = status

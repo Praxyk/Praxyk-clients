@@ -68,7 +68,7 @@ class Transaction(PraxykBase) :
 
     # @info - return the results object associated with this transction
     def results(self, *args, **kwargs) :
-        return Results(auth_token=self.auth_token, caller=self.caller, trans_id=self.trans_id, 
+        return Results(trans_id=self.trans_id, auth_token=self.auth_token, caller=self.caller, 
                        local=self.local, port=self.port, *args, **kwargs)
 
     def put(cancel=False):

@@ -55,7 +55,7 @@ class Praxyk(PraxykBase) :
     #         info associated with this object. So instead of having to say user=praxyk.User(auth_token=xxx, ...),
     #         they can just say pr = Praxyk(email=xxx, password=yyy);user = pr.User();user.get(); print user.to_json()
     def user(self, *args, **kwargs) :
-        return User(auth_token=self.auth_token, caller=self.caller, user_id=self.caller.get('user_id', None),
+        return User(auth_token=self.auth_token, caller=self.caller, user_id=None if not self.caller else self.caller.get('user_id', None),
                     local=self.local, port=self.port, *args, **kwargs)
 
     # @info - like the User function, this is a convenient factory class to instantiate a Transaction object with

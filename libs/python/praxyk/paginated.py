@@ -19,9 +19,9 @@ from base import PraxykBase
 class Paginated(PraxykBase) :
 
     def __init__(self, pagination=None, first_page_num=None, last_page_num=None, page=None,
-                 prev_page_num=None, next_page_num=None, page_size=None, **kwargs) :
+                 prev_page_num=None, next_page_num=None, page_size=None, *args, **kwargs) :
         
-        super(Paginated, self).__init__(**kwargs)
+        super(Paginated, self).__init__(*args, **kwargs)
         self.next_page_num = next_page_num
         self.prev_page_num = prev_page_num
         self.last_page_num = last_page_num

@@ -20,8 +20,8 @@ from result import Result
 #         class will be filled with the needed data to page through a transaction's results
 class Results(Paginated) :
 
-    def __init__(self, trans_id, **kwargs) :
-        super(Results, self).__init__(**kwargs)
+    def __init__(self, trans_id, *args,  **kwargs) :
+        super(Results, self).__init__(*args, **kwargs)
         self.results= []
         self.results_raw = ""
         self.trans_id = trans_id
@@ -37,19 +37,15 @@ class Results(Paginated) :
         if self.trans_id  :
             payload['trans_id'] = self.trans_id
 
-        try :
-            response = super(Results, self).get(url=self.RESULTS_ROUTE+str(self.trans_id), payload=payload, **kwargs)
-            if response :
-                if response.get('page', None) :
-                    self.results_raw = response['page'].get('results', None)
-                else :
-                    self.results_raw = response.get('results', None)
-                if not self.results_raw : return None
-                self.results = [Result(auth_token=self.auth_token, caller=self.caller, **result) for result in self.results_raw]
-                return self.results_raw
-        except Exception as e :
-            print str(e)
-            raise e
+        response = super(Results, self).get(url=self.RESULTS_ROUTE+str(self.trans_id), payload=payload, **kwargs)
+        if response :
+            if response.get('page', None) :
+                self.results_raw = response['page'].get('results', None)
+            else :
+                self.results_raw = response.get('results', None)
+            if not self.results_raw : return None
+            self.results = [Result(auth_token=self.auth_token, caller=self.caller, **result) for result in self.results_raw]
+            return self.results_raw
         return None
 
 

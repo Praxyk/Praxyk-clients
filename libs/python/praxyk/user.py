@@ -74,13 +74,13 @@ class User(PraxykBase) :
 	# @info -  This is convenient factory function for generating a Transaction object that is pre-loaded with the
     #          information specific to this user, like the auth_token stored and the user_id associated with this object.
     def transaction(self, *args, **kwargs) :
-        return Transaction(auth_token=self.auth_token, caller=self.caller, user_id=self.caller.get('user_id', None),
+        return Transaction(auth_token=self.auth_token, caller=self.caller, user_id=None if not self.caller else self.caller.get('user_id', None),
                            local=self.local, port=self.port, *args, **kwargs)
 
 	# @info -  This is convenient factory function for generating a Transactions object that is pre-loaded with the
     #          information specific to this user, like the auth_token stored and the user_id associated with this object.
     def transactions(self, *args, **kwargs) :
-        return Transactions(auth_token=self.auth_token, caller=self.caller, user_id=self.caller.get('user_id', None),
+        return Transactions(auth_token=self.auth_token, caller=self.caller, user_id=None if not self.caller else self.caller.get('user_id', None),
                            local=self.local, port=self.port, *args, **kwargs)
 
     def to_dict(self) :
