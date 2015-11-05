@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 
+# Apple Crap
+.DS_Store
+
 # C extensions
 *.so
 
