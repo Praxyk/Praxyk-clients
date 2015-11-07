@@ -32,7 +32,7 @@ class Result(PraxykBase) :
         self.prediction = prediction
 
     def get(self) :
-        payload = {'token' : self.auth_token, page_size : 1, page : self.item_number}
+        payload = {'token' : self.auth_token, 'page_size' : 1, 'page' : self.item_number}
         try :
             response = super(Result, self).get(self.RESULTS_ROUTE+str(self.trans_id), payload)
             if response :
