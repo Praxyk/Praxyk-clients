@@ -43,18 +43,11 @@ class Results(Paginated) :
                 self.results_raw = response['page'].get('results', None)
             else :
                 self.results_raw = response.get('results', None)
-<<<<<<< Updated upstream
-            if not self.results_raw : return None
-            self.results = [Result(auth_token=self.auth_token, caller=self.caller, **result) for result in self.results_raw]
-            return self.results_raw
-=======
             for result in self.results_raw :
                 self.results.append(Result(auth_token=self.auth_token, caller=self.caller,
                                            local=self.local, port=self.port, 
                                            trans_id=self.trans_id, user_id=self.caller.get('user_id', None), **result))
             return self
-            # return self.results_raw
->>>>>>> Stashed changes
         return None
 
 
