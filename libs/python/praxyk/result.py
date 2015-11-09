@@ -47,8 +47,9 @@ class Result(PraxykBase) :
                     self.item_name = self.result.get('item_name', None)
                     self.item_number = self.result.get('item_number', None)
                     self.prediction = self.result.get('prediction', None)
-                    return self.transaction
+                    return self
         except Exception, e :
+            raise e
             sys.stderr.write(str(e))
         return None
 
@@ -66,6 +67,6 @@ class Result(PraxykBase) :
                 'item_number' : self.item_number,
                 'prediction' : self.prediction
                 }
-        base_dict.update(transaction_dict)
+        base_dict.update(result_dict)
         return base_dict
 

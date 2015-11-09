@@ -2,7 +2,7 @@
 
 ## @auth John Allard, Nick Church, others
 ## @date Oct 2015
-## @github https://github.com/jhallard/praxyk
+## @github https://github.com/praxyk/praxyk-clients
 ## @license MIT
 
 
@@ -60,7 +60,8 @@ class Transaction(PraxykBase) :
                 self.uploads_success = self.transaction.get('uploads_success', None)
                 self.uploads_failed = self.transaction.get('uploads_failed', None)
                 self.size_total_KB = self.transaction.get('size_total_KB', None)
-                return self.transaction
+                return self
+                # return self.transaction
 
         except Exception as e:
             raise PraxykException('Error: malformed response from GET request for transaction \'%s\'. Unable to load result dictionary' % self.trans_id, errors=response)

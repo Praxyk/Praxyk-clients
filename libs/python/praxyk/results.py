@@ -39,13 +39,19 @@ class Results(Paginated) :
 
         response = super(Results, self).get(url=self.RESULTS_ROUTE+str(self.trans_id), payload=payload, **kwargs)
         if response :
+            self.results = []
             if response.get('page', None) :
                 self.results_raw = response['page'].get('results', None)
             else :
                 self.results_raw = response.get('results', None)
             if not self.results_raw : return None
-            self.results = [Result(auth_token=self.auth_token, caller=self.caller, **result) for result in self.results_raw]
-            return self.results_raw
+            for result in self.results_raw :
+                self.results.append(Result(auth_token=self.auth_token, caller=self.caller,
+                                           local=self.local, port=self.port, 
+                                           trans_id=self.trans_id, user_id=self.user_id, **result)
+                                        )
+            return self
+            # return self.results_raw
         return None
 
 

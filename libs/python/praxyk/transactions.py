@@ -41,6 +41,7 @@ class Transactions(Paginated) :
         try :
             response = super(Transactions, self).get(url=self.TRANSACTIONS_ROUTE, payload=payload, **kwargs)
             if response :
+                self.transactions = []
                 if response.get('page', None) :
                     self.transactions_raw = response['page'].get('transactions', None)
                 else :
@@ -49,7 +50,8 @@ class Transactions(Paginated) :
                     return None
                 for trans in self.transactions_raw :
                     self.transactions.append(Transaction(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port,  **trans))
-                return self.transactions_raw
+                return self
+                # return self.transactions_raw
         except Exception as e :
             print str(e)
             raise e

@@ -33,13 +33,19 @@ class Paginated(PraxykBase) :
 
     def get(self, url, payload, pagination=None, page_size=None, page=None) :
 
-        if pagination : self.pagination = pagination
-        if page_size  : self.page_size = page_size
-        if page       : self.page = page
+        if pagination is not None :
+            self.pagination = pagination
+        if page_size : 
+            self.page_size = page_size
+        if page : 
+            self.page = page
 
-        if self.page_size  : payload['page_size'] = self.page_size
-        if self.page       : payload['page'] = self.page
-        if self.pagination : payload['pagination'] = self.pagination
+        if self.page_size is not None  :
+             payload['page_size'] = self.page_size
+        if self.page is not None :
+             payload['page'] = self.page
+        if self.pagination is not None :
+             payload['pagination'] = self.pagination
         try :
             response = super(Paginated, self).get(url, payload)  
             if response :
