@@ -15,6 +15,8 @@ from user import User
 from transaction import Transaction
 from transactions import Transactions
 
+from pod import pod_ocr
+
 
 # @info - Main Praxyk class for the API. This class is used to manage one's account and perform 
 #         most data-grabbing operations. User's log in through this class (either in the constructor
@@ -42,6 +44,8 @@ class Praxyk(PraxykBase) :
         elif email and password :
             payload = {'email' : email, 'password' : password}
             results = super(Praxyk, self).post(self.TOKENS_ROUTE, payload)
+        else :
+            return False
 
         if results :
             self.caller = results.get('user', None)
@@ -68,3 +72,8 @@ class Praxyk(PraxykBase) :
     #          information specific to this user, like the auth_token stored and the user_id associated with this object.
     def transactions(self, *args, **kwargs) :
         return Transactions(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port, *args, **kwargs)
+
+    def pod(self, service, *args, **kwargs) :
+        if service.lower() == 'ocr' :
+            return pod_ocr.POD_OCR(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port, *args, **kwargs)
+        return None

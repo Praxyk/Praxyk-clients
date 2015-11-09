@@ -31,11 +31,14 @@ class PraxykBase(object) :
 
         self.BASE_URL = ("http://127.0.0.1:" + str(self.port) + "/") if self.local else "http://api.praxyk.com/"
         self.VERSION  = "v1/"
-        self.BASE_ROUTE         = self.BASE_URL + self.VERSION
-        self.TOKENS_ROUTE       = self.BASE_ROUTE + "tokens/"
-        self.USERS_ROUTE        = self.BASE_ROUTE + "users/"
-        self.TRANSACTIONS_ROUTE = self.BASE_ROUTE + "transactions/"
-        self.RESULTS_ROUTE      = self.BASE_ROUTE + "results/"
+        self.BASE_ROUTE           = self.BASE_URL + self.VERSION
+        self.TOKENS_ROUTE         = self.BASE_ROUTE + "tokens/"
+        self.USERS_ROUTE          = self.BASE_ROUTE + "users/"
+        self.TRANSACTIONS_ROUTE   = self.BASE_ROUTE + "transactions/"
+        self.RESULTS_ROUTE        = self.BASE_ROUTE + "results/"
+        self.POD_OCR_ROUTE        = self.BASE_ROUTE + "pod/ocr/"
+        self.POD_BAYES_SPAM_ROUTE = self.BASE_ROUTE + "pod/bayes_spam/"
+        self.POD_FACE_DETECT      = self.BASE_ROUTE + "pod/face_detect/"
 
 
     # @info - simple helper wrapper function that can be used to ensure a function
@@ -92,26 +95,33 @@ class PraxykBase(object) :
         else :
             return r
 
-    def get(self, url, payload) :
-        r = requests.get(url, data=json.dumps(payload), headers=self.headers)
+    def get(self, url, payload, **kwargs) :
+        r = requests.get(url, data=json.dumps(payload), headers=self.headers, **kwargs)  
         if not self.check_return(r) :
             raise PraxykException(message="Request Failed (GET) : Url (%s) | Payload (%s)" % (url, payload))
         return json.loads(r.text)
 
-    def post(self, url, payload) :
-        r = requests.post(url, data=json.dumps(payload), headers=self.headers)
+    def post(self, url, payload, **kwargs) :  
+        # if we're posting files as a multi-form don't use the json headers
+        if kwargs.get('files', None) : 
+            data = payload
+            r = requests.post(url, data=data, **kwargs)  
+        else :
+            data = json.dumps(payload)
+            r = requests.post(url, data=data, headers=self.headers, **kwargs)  
+
         if not self.check_return(r) :
             raise PraxykException(message="Request Failed (POST) : Url (%s) | Payload (%s)" % (url, payload))
         return json.loads(r.text)
 
-    def put(self, url, payload) :
-        r = requests.put(url, data=json.dumps(payload), headers=self.headers)
+    def put(self, url, payload, **kwargs) :  
+        r = requests.put(url, data=json.dumps(payload), headers=self.headers, **kwargs)  
         if not self.check_return(r) :
             raise PraxykException("Request Failed (PUT) : Url (%s) | Payload (%s)" % (url, payload))
         return json.loads(r.text)
 
-    def delete(self, url, payload) :
-        r = requests.delete(url, data=json.dumps(payload), headers=self.headers)
+    def delete(self, url, payload, **kwargs) :  
+        r = requests.delete(url, data=json.dumps(payload), headers=self.headers, **kwargs)  
         if not self.check_return(r) :
             raise PraxykException("Request Failed (DELETE) : Url (%s) | Payload (%s)" % (url, payload))
         return json.loads(r.text)
