@@ -6,27 +6,22 @@ import datetime
 import json
 import getpass
 import subprocess
+import ConfigParser
 import praxyk
 
 from os.path import expanduser
 
 global CONFIG_DIR 
 global CLIENT_CONFIG_FILE
+global USER_EMAIL
+global USER_PASS
 
 CONFIG_DIR = str(expanduser("~"))+'/.praxyk_client/'
 CLIENT_CONFIG_FILE = CONFIG_DIR + 'config'
 
-ACTIONS = ['login', 'register', 'create', 'update', 'get', 'exit']
-NOUNS = ['transaction', 'transactions', 'result', 'results', 'user', 'users']
-
 
 BASE_URL = 'http://127.0.0.1:5000/'
 # BASE_URL = 'http://api.praxyk.com:5000/'
-TOKENS_URL =  BASE_URL+'tokens/'
-COMPUTE_URL = BASE_URL+'compute/'
-SNAPSHOTS_URL = BASE_URL+'snapshots/'
-USERS_URL = BASE_URL+'users/'
-SSHKEYS_URL = BASE_URL+'sshkeys/'
 
 DESCRIPTION = """
 Documentation for this script is available here: https://github.com/Praxyk/Praxyk-Clients/wiki/Command-Line-Utility
@@ -39,6 +34,19 @@ def parse_args(argv) :
     parser.add_argument('--root', action='store_true',  help="This flag will cause the program to look for a different config file, one that contains " +\
                                        "a root token. If you don't have the root token, giving this flag will only cause everything to fail.")                                                       "depending on what you are doing")
     return parser.parse_args()
+
+def load_user():
+    config = ConfigParser.ConfigParser()
+    try:
+        configfile = open(CLIENT_CONFIG_FILE, 'r')
+        config.readfp(configfile)
+        USER_EMAIL = config.get('defaut', 'email')
+        USER_PASS = config.get('default', 'password')
+    except Exception:
+        sys.stderr.write('Unable to open the local configuration file.')
+        return login_user()
+
+
 
 def get_input(desc, default=None) :
     desc = desc + ("" if not default else " default : (%s)" % str(default))
@@ -109,7 +117,13 @@ def load_auth_info() :
 
 # @info - this logs the user into the API service by submitting their username and password in return for a temporary access
 #         token. This token is stored in a hidden directory and can be loaded automatically when the user makes future requests.
-def login_user() :
+def login_user(argv=None) :
+
+def register_user() :
+
+def exit_session() :
+
+
 
 def change_password(user=None) :
 
@@ -123,38 +137,45 @@ def get_user(argv=None) :
 
 def get_users(argv=None) :
 
-ACTION_MAP = {  'login'      	: { ""  : login_user }
-		'register'   	: { ""	: register_user }
-		'exit'		: { ""	: exit_session }
-		'switch'        : { "user" : switch_user }
-		'change'        : { "email": change_email,
-		                 "password": change_password }
-		'apply'         : {"coupon": apply_coupon }
-		'begin'         : {"transaction": begin_transaction }
-		'cancel'        : {"transaction": cancel_transaction }
-                'display'    	: { "user" : display_user,
-                            "transactions" : display_transactions,
-                             "transaction" : display_transaction,
-                                 "results" : display_results,
-                                  "result" : display_result,
-                                   "users" : get_users }
-}
+GREETING = 'Welcome to the Praxyk command line client!\nPlease enter a command. (help displays a list of commands)\n'
 
-# @info - main function, has the sys.argv args parsed and performs a switch based on those arguments.
+ACTION_MAP = { 'login'  : { ""  : login_user },
+            'register'  : { ""  : register_user },
+            'exit'      : { ""  : exit_session },
+            'switch'    : { "user" : switch_user },
+            'change'    : {
+                            "email" : change_email,
+                         "password" : change_password },
+            'apply'      : {
+                            "coupon": apply_coupon },
+            'begin'      : {
+                       "transaction": begin_transaction },
+            'cancel'     : {
+                      "transaction" : cancel_transaction },
+            'display'    : { "user" : display_user,
+                     "transactions" : display_transactions,
+                      "transaction" : display_transaction,
+                          "results" : display_results,
+                           "result" : display_result,
+                            "users" : get_users } }
+
+# @info - main function, loops to get user input and calls
+# appropriate functions as per the user's command
 if __name__ == "__main__" :
     args = parse_args(sys.argv)
-
     if args.root :
         CLIENT_CONFIG_FILE = CONFIG_DIR + 'root.config'
+    user = load_user(CLIENT_CONFIG_FILE)
+    print GREETING
+    command = get_input()
+    while (command != 'exit'):
+        action_func = ACTION_MAP.get(args.action).get(args.noun, None)
+        if not action_func :
+            sys.stderr.write(('It looks like your input of [%s] is invalid or unimplemented.' % (args.action+" " +args.noun)) 
+        action_func(argv=args.specifics)
+        command = get_input()
 
-    action_func = ACTION_MAP.get(args.action).get(args.noun, None)
-    if not action_func :
-        sys.stderr.write(("It looks like your input of [%s] is invalid or unimplemented." +\
-                         " If you think this is wrong tell John. \n") % (args.action+" " +args.noun)) 
-        sys.exit(1)
-    res = action_func(argv=args.specifics)
-    
-    sys.exit(0 if res else 1)
+    exit_session()
     
     
 
