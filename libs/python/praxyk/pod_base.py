@@ -1,4 +1,4 @@
-#!/usr/bin/env python																																
+#!/usr/bin/env python																
 
 ## @auth John Allard, Nick Church, others
 ## @date Oct 2015
@@ -16,8 +16,8 @@ from transaction import Transaction
 
 
 # @info - This represents a base class that all pod models can derive from. This class will hold
-#		 the meta-data common to all types of pod transactions, like user id, creation time, status,
-#		 etc.
+#	 the meta-data common to all types of pod transactions, like user id, creation time, status,
+#	 etc.
 class PODBase(PraxykBase) :
 
 	def __init__(self, name=None, user_id=None, *args, **kwargs) :

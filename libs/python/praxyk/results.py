@@ -43,6 +43,7 @@ class Results(Paginated) :
                 self.results_raw = response['page'].get('results', None)
             else :
                 self.results_raw = response.get('results', None)
+            if not self.results_raw : return None
             for result in self.results_raw :
                 self.results.append(Result(auth_token=self.auth_token, caller=self.caller,
                                            local=self.local, port=self.port, 

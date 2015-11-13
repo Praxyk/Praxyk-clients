@@ -38,21 +38,21 @@ class Transactions(Paginated) :
         if self.user_id  :
             payload['user_id'] = self.user_id
 
-        try :
-            response = super(Transactions, self).get(url=self.TRANSACTIONS_ROUTE, payload=payload, **kwargs)
-            if response :
-                if response.get('page', None) :
-                    self.transactions_raw = response['page'].get('transactions', None)
-                else :
-                    self.transactions_raw = response.get('transactions', None)
-                if not self.transactions_raw : 
-                    return None
-                for trans in self.transactions_raw :
-                    self.transactions.append(Transaction(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port,  **trans))
-                return self.transactions_raw
-        except Exception as e :
-            print str(e)
-            raise e
+        # try :
+        response = super(Transactions, self).get(url=self.TRANSACTIONS_ROUTE, payload=payload, **kwargs)
+        if response :
+            if response.get('page', None) :
+                self.transactions_raw = response['page'].get('transactions', None)
+            else :
+                self.transactions_raw = response.get('transactions', None)
+            if not self.transactions_raw : 
+                return None
+            for trans in self.transactions_raw :
+                self.transactions.append(Transaction(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port,  **trans))
+            return self
+        # except Exception as e :
+            # print str(e)
+            # raise e
         return None
 
 

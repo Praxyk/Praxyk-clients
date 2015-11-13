@@ -60,7 +60,7 @@ class Transaction(PraxykBase) :
                 self.uploads_success = self.transaction.get('uploads_success', None)
                 self.uploads_failed = self.transaction.get('uploads_failed', None)
                 self.size_total_KB = self.transaction.get('size_total_KB', None)
-                return self.transaction
+                return self
 
         except Exception as e:
             raise PraxykException('Error: malformed response from GET request for transaction \'%s\'. Unable to load result dictionary' % self.trans_id, errors=response)
@@ -81,7 +81,7 @@ class Transaction(PraxykBase) :
     # @info - return the results object associated with this transction
     def results(self, *args, **kwargs) :
         return Results(trans_id=self.trans_id, auth_token=self.auth_token, caller=self.caller, 
-                       local=self.local, port=self.port, *args, **kwargs).get()
+                       local=self.local, port=self.port, *args, **kwargs)
 
     def put(cancel=False):
         if self.trans_id and cancel:

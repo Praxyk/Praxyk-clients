@@ -32,7 +32,7 @@ class Result(PraxykBase) :
         self.prediction = prediction
 
     def get(self) :
-        payload = {'token' : self.auth_token, page_size : 1, page : self.item_number}
+        payload = {'token' : self.auth_token, 'page_size' : 1, 'page' : self.item_number}
         try :
             response = super(Result, self).get(self.RESULTS_ROUTE+str(self.trans_id), payload)
             if response :
@@ -47,7 +47,7 @@ class Result(PraxykBase) :
                     self.item_name = self.result.get('item_name', None)
                     self.item_number = self.result.get('item_number', None)
                     self.prediction = self.result.get('prediction', None)
-                    return self.transaction
+                    return self
         except Exception, e :
             sys.stderr.write(str(e))
         return None
@@ -66,6 +66,6 @@ class Result(PraxykBase) :
                 'item_number' : self.item_number,
                 'prediction' : self.prediction
                 }
-        base_dict.update(transaction_dict)
+        base_dict.update(result_dict)
         return base_dict
 
