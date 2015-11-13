@@ -2,7 +2,7 @@
 
 ## @auth John Allard, Nick Church, others
 ## @date Oct 2015
-## @github https://github.com/jhallard/praxyk
+## @github https://github.com/praxyk/praxyk-clients
 ## @license MIT
 
 

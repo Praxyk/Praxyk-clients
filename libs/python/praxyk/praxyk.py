@@ -76,6 +76,9 @@ class Praxyk(PraxykBase) :
     def pod(self, service, *args, **kwargs) :
         if service.lower() == 'ocr' :
             return pod_ocr.POD_OCR(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port, *args, **kwargs)
+<<<<<<< HEAD
         if service.lower() == 'face_detect' :
             return pod_face_detect.POD_FaceDetect(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port, *args, **kwargs)
+=======
+>>>>>>> master
         return None

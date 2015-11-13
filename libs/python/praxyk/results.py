@@ -39,6 +39,7 @@ class Results(Paginated) :
 
         response = super(Results, self).get(url=self.RESULTS_ROUTE+str(self.trans_id), payload=payload, **kwargs)
         if response :
+            self.results = []
             if response.get('page', None) :
                 self.results_raw = response['page'].get('results', None)
             else :

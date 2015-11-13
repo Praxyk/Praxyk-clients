@@ -55,9 +55,9 @@ class Paginated(PraxykBase) :
             self.page = response.get('page', {}).get('page_number', page)
             
             return response
-        # except Exception as e :
-            # print str(e)
-            # raise PraxykException(message="GET Request Failed in Paginated Class. URL (%s)" % url)
+        except Exception as e :
+            print str(e)
+            raise PraxykException(message="GET Request Failed in Paginated Class. URL (%s)" % url)
         return None
 
 

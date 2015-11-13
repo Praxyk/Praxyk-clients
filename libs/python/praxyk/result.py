@@ -50,6 +50,7 @@ class Result(PraxykBase) :
                     return self
         except Exception, e :
             sys.stderr.write(str(e))
+            raise e
         return None
 
 
