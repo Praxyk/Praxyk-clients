@@ -40,21 +40,21 @@ class Paginated(PraxykBase) :
         if self.page_size  : payload['page_size'] = self.page_size
         if self.page       : payload['page'] = self.page
         if self.pagination : payload['pagination'] = self.pagination
-        # try :
-        response = super(Paginated, self).get(url, payload, *args, **kwargs)  
-        if response :
-            self.next_page_num = self.get_params_from_url(response.get('next_page', "")).get('page', None)
-            self.prev_page_num = self.get_params_from_url(response.get('prev_page', "")).get('page', None)
-            self.first_page_num = self.get_params_from_url(response.get('first_page', "")).get('page', None)
-            self.last_page_num = self.get_params_from_url(response.get('last_page', "")).get('page', None)
+        try :
+            response = super(Paginated, self).get(url, payload, *args, **kwargs)  
+            if response :
+                self.next_page_num = self.get_params_from_url(response.get('next_page', "")).get('page', None)
+                self.prev_page_num = self.get_params_from_url(response.get('prev_page', "")).get('page', None)
+                self.first_page_num = self.get_params_from_url(response.get('first_page', "")).get('page', None)
+                self.last_page_num = self.get_params_from_url(response.get('last_page', "")).get('page', None)
 
-            self.next_page_num = int(self.next_page_num[0]) if self.next_page_num else None
-            self.prev_page_num = int(self.prev_page_num[0]) if self.prev_page_num else None
-            self.first_page_num = int(self.first_page_num[0]) if self.first_page_num else None
-            self.last_page_num = int(self.last_page_num[0]) if self.last_page_num else None
-            self.page = response.get('page', {}).get('page_number', page)
-            
-            return response
+                self.next_page_num = int(self.next_page_num[0]) if self.next_page_num else None
+                self.prev_page_num = int(self.prev_page_num[0]) if self.prev_page_num else None
+                self.first_page_num = int(self.first_page_num[0]) if self.first_page_num else None
+                self.last_page_num = int(self.last_page_num[0]) if self.last_page_num else None
+                self.page = response.get('page', {}).get('page_number', page)
+                
+                return response
         except Exception as e :
             print str(e)
             raise PraxykException(message="GET Request Failed in Paginated Class. URL (%s)" % url)
