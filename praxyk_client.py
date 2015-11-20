@@ -26,8 +26,8 @@ CONFIG_DIR = str(expanduser("~"))+'/.praxyk_client/'
 CLIENT_CONFIG_FILE = CONFIG_DIR + 'config'
 PROMPT = '=>'
 
-BASE_URL = 'http://127.0.0.1:5000/'
-# BASE_URL = 'http://api.praxyk.com:5000/'
+#BASE_URL = 'http://127.0.0.1:5000/'
+BASE_URL = 'http://test.praxyk.com:5000/'
 
 DESCRIPTION = """
 Documentation for this script is available here: https://github.com/Praxyk/Praxyk-Clients/wiki/Command-Line-Utility
@@ -40,7 +40,9 @@ def parse_args(argv) :
     parser.add_argument('--root', action='store_true',  help="This flag will cause the program to look for a different" +\
         " config file, one that contains a root token. If you don't have the root token, giving this flag will only " +\
         "cause everything to fail, depending on what you are doing")
-    parser.add_argument('--script', action='store_true', help='This flag will tell the client script that you want to run it in \'scripting\' mode, where this program will expect only commands to come from the standard input, so as not to present the script with choices.')
+    parser.add_argument('--script', action='store_true', help='This flag will tell the client script that you want to run ' +\
+    	'it in \'scripting\' mode, where this program will expect only commands to come from the standard input, so as not to ' +\
+    	'present the script with choices.')
     return parser.parse_args()
 
 
@@ -175,6 +177,8 @@ def register_user() :
         user = PRAXYK.user(name=user_name,email=user_email).post()
         if user :
             print 'Welcome, %s!' % user_name
+            print 'You will need to confirm your account through your email before using our services.'
+            exit_session()
         else :
             print 'Registration failed :(' # @TODO : put a reason why the registration failed
             if get_yes_no ('Would you like to attempt to register again?') :
