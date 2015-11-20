@@ -25,13 +25,19 @@ global SCRIPTING
 CONFIG_DIR = str(expanduser("~"))+'/.praxyk_client/'
 CLIENT_CONFIG_FILE = CONFIG_DIR + 'config'
 PROMPT = '=> '
+GREETING = '\nWelcome to the Praxyk command line client!\nPlease enter a command. (help displays a list of commands)\n'+\
+    'Type ^C at any time to quit.'
 
 #BASE_URL = 'http://127.0.0.1:5000/'
-BASE_URL = 'http://test.praxyk.com:5000/'
+BASE_URL = 'http://api.praxyk.com'
 
 DESCRIPTION = """
 Documentation for this script is available here: https://github.com/Praxyk/Praxyk-Clients/wiki/Command-Line-Utility
 """
+
+def set_up_env() :
+    if not os.path.exists(CONFIG_DIR) :
+        os.makedirs(CONFIG_DIR)
 
 # @info - parse command line args into useable dictionary
 #         right now we only take a config file as an argument
@@ -48,11 +54,13 @@ def parse_args(argv) :
 
 
 def get_input(desc, default=None) :
+    if desc == '' :
+        desc = PROMPT
     desc = desc + ("" if not default else " default : (%s)" % str(default))
-    inp = raw_input(PROMPT+desc).strip()
+    inp = raw_input(desc).strip()
     inp = inp if inp else default
     while not inp :
-        inp = raw_input(PROMPT+' '+desc).strip()
+        inp = raw_input(desc).strip()
     return inp
 
 def get_passwd(desc = None) :
@@ -126,13 +134,13 @@ def load_user() :
             config = ConfigParser.ConfigParser()
             configfile = open(CLIENT_CONFIG_FILE, 'r')
             config.readfp(configfile)
-            USER_AUTH = config.get('default', 'auth_tok')
-            USER_EMAIL = config.get('defaut', 'email')
-            USER_PASS = config.get('default', 'password')
-            if not PRAXYK.login(auth_token=USER_AUTH):
-                print 'Unable to log in using credentials in config file, please log in with fresh credentials, '+\
+            USER_AUTH = config.get('default_section', 'auth_tok')
+            if not PRAXYK.login(auth_token=USER_AUTH): # @TODO add support for changing the config section to load
+                print 'Unable to log in using the default credentials in config file, please log in with fresh credentials, '+\
                     'or type ^C to exit.'
                 return login_user()
+            else :
+                print 'Successfully logged in using credentials from config file.'
         except Exception:
             sys.stderr.write('Unable to open the local configuration file.\n')
             if SCRIPTING:
@@ -154,7 +162,13 @@ def login_user() :
         USER_EMAIL = get_input('Email: ')
         USER_PASS = get_passwd()
     print 'Login successful!'
-    return PRAXYK.user().get()
+    user = PRAXYK.user().get()
+    config = ConfigParser.ConfigParser()
+    configfile = open(CLIENT_CONFIG_FILE, 'w+')
+    config.add_section('default_section')
+    config.set('default_section', 'auth_tok', '%s' % user.auth_token)
+    config.write(configfile)
+    return user
 
 def register_user() :
     print 'Welcome to Praxyk!'
@@ -199,7 +213,7 @@ def update_user(argv=None) :
     pass
 
 def get_user(argv=None) :
-    pass
+    print PRAXYK.user.get()
 
 def get_users(argv=None) :
     pass
@@ -236,6 +250,7 @@ def display_result() :
 def parse_command(command) :
     if command == '' :
         return
+    print 'command: ',command
     if not command.action or command.action not in ACTIONS :
         sys.stderr.write('Must include a valid action (%s)\n' % ACTIONS)
         return
@@ -250,9 +265,6 @@ def parse_command(command) :
         return
     res = action_func(argv=command.specifics)
 
-
-GREETING = 'Welcome to the Praxyk command line client!\nPlease enter a command. (help displays a list of commands)\n'+\
-    'Type ^C at any time to quit.'
 
 ACTION_MAP = {
     'login'     : { ""  : login_user },
@@ -290,6 +302,7 @@ NOUNS = [ noun_func_pair.keys() for noun_func_pair in ACTION_MAP.values() ]
 # appropriate functions as per the user's command
 if __name__ == "__main__" :
     try:
+        set_up_env()
         PRAXYK = Praxyk()
         SCRIPTING = False
         args = parse_args(sys.argv)
