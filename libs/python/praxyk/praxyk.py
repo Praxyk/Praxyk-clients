@@ -15,7 +15,7 @@ from user import User
 from transaction import Transaction
 from transactions import Transactions
 
-from pod import pod_ocr
+from pod import pod_ocr, pod_face_detect
 
 
 # @info - Main Praxyk class for the API. This class is used to manage one's account and perform 
@@ -76,4 +76,6 @@ class Praxyk(PraxykBase) :
     def pod(self, service, *args, **kwargs) :
         if service.lower() == 'ocr' :
             return pod_ocr.POD_OCR(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port, *args, **kwargs)
+        if service.lower() == 'face_detect' :
+            return pod_face_detect.POD_FaceDetect(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port, *args, **kwargs)
         return None

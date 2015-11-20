@@ -6,7 +6,7 @@
 ## @license MIT
 
 
-import os, sys, json, requests
+import os, sys, json, requests, time
 import subprocess, argparse, getpass
 import datetime as dt
 from praxyk_exception import PraxykException
@@ -61,11 +61,22 @@ class Transaction(PraxykBase) :
                 self.uploads_failed = self.transaction.get('uploads_failed', None)
                 self.size_total_KB = self.transaction.get('size_total_KB', None)
                 return self
-                # return self.transaction
 
         except Exception as e:
             raise PraxykException('Error: malformed response from GET request for transaction \'%s\'. Unable to load result dictionary' % self.trans_id, errors=response)
         return {}
+
+
+    # @info - wait for the transaction to either finish or fail, sleeps for interval seconds, timesout at timeout seconds
+    def spin(self, interval=1, timeout=60) :
+        length = 0
+        if interval <= 0 : return False
+        while self.status in ['active', 'new'] and length <= timeout:
+            time.sleep(interval)
+            length += interval
+            self.get()
+        return self.status in ['finished', 'failed'] 
+
 
     # @info - return the results object associated with this transction
     def results(self, *args, **kwargs) :

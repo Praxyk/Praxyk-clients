@@ -1,4 +1,4 @@
-#!/usr/bin/env python																																
+#!/usr/bin/env python                                                                                                                                
 
 ## @auth John Allard, Nick Church, others
 ## @date Oct 2015
@@ -15,12 +15,10 @@ from pod_base import PODBase
 from results import Results
 
 
-# @info - this class is used to access the optical-character-recognition route of the POD service.
-#         It allows users to upload files to the API to perform OCR upon.
-class POD_OCR(PODBase) :
+class POD_BayesSpam(PODBase) :
 
     def __init__(self, file_names=[], *args, **kwargs) :
-        super(POD_OCR, self).__init__(*args, **kwargs)
+        super(POD_BayesSpam, self).__init__(*args, **kwargs)
         self.file_names = file_names
         self.transaction = None
 
@@ -40,7 +38,7 @@ class POD_OCR(PODBase) :
 
             # PODBase super class automatically turns the result from the API into a praxyk.Transaction
             # object for us to use
-            new_trans = super(POD_OCR, self).post(self.POD_OCR_ROUTE, payload, files=files, **kwargs)
+            new_trans = super(POD_BayesSpam, self).post(self.POD_BAYES_SPAM_ROUTE, payload, files=files, **kwargs)
             if new_trans :    
                 self.transaction = new_trans
                 return self.transaction

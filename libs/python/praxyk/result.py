@@ -49,8 +49,8 @@ class Result(PraxykBase) :
                     self.prediction = self.result.get('prediction', None)
                     return self
         except Exception, e :
-            raise e
             sys.stderr.write(str(e))
+            raise e
         return None
 
 
