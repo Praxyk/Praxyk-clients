@@ -134,13 +134,18 @@ def load_user() :
             config = ConfigParser.ConfigParser()
             configfile = open(CLIENT_CONFIG_FILE, 'r')
             config.readfp(configfile)
-            USER_AUTH = config.get('default_section', 'auth_tok')
-            if not PRAXYK.login(auth_token=USER_AUTH): # @TODO add support for changing the config section to load
-                print 'Unable to log in using the default credentials in config file, please log in with fresh credentials, '+\
-                    'or type ^C to exit.'
-                return login_user()
+            print 'CONFIG: ',config.get('default_section','email')
+            answer = get_yes_no('Would you like to use the credentials for the account associated with the email %s?' % config.get('default_section','email'))
+            if answer :
+                USER_AUTH = config.get('default_section', 'auth_tok')
+                if not PRAXYK.login(auth_token=USER_AUTH): # @TODO add support for changing the config section to load
+                    print 'Unable to log in using the default credentials in config file, please log in with fresh credentials, ' +\
+                        'or type ^C to exit.'
+                    return login_user()
+                else :
+                    print 'Successfully logged in using credentials from config file.'
             else :
-                print 'Successfully logged in using credentials from config file.'
+                return login_user
         except Exception:
             sys.stderr.write('Unable to open the local configuration file.\n')
             if SCRIPTING:
@@ -167,6 +172,7 @@ def login_user() :
     configfile = open(CLIENT_CONFIG_FILE, 'w+')
     config.add_section('default_section')
     config.set('default_section', 'auth_tok', '%s' % user.auth_token)
+    config.set('default_section', 'email', '%s' % user.email)
     config.write(configfile)
     return user
 
@@ -302,12 +308,12 @@ NOUNS = [ noun_func_pair.keys() for noun_func_pair in ACTION_MAP.values() ]
 # appropriate functions as per the user's command
 if __name__ == "__main__" :
     try:
-        set_up_env()
         PRAXYK = Praxyk()
         SCRIPTING = False
         args = parse_args(sys.argv)
         if args.root :
             CLIENT_CONFIG_FILE = CONFIG_DIR + 'root.config'
+        set_up_env()
         USER = load_user()
         print GREETING
 
