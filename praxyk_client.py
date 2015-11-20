@@ -13,7 +13,7 @@ from libs.python.praxyk import Praxyk
 
 from os.path import expanduser
 
-global CONFIG_DIR 
+global CONFIG_DIR
 global CLIENT_CONFIG_FILE
 global USER_AUTH
 global USER_EMAIL
@@ -24,7 +24,7 @@ global SCRIPTING
 
 CONFIG_DIR = str(expanduser("~"))+'/.praxyk_client/'
 CLIENT_CONFIG_FILE = CONFIG_DIR + 'config'
-PROMPT = '=>'
+PROMPT = '=> '
 
 #BASE_URL = 'http://127.0.0.1:5000/'
 BASE_URL = 'http://test.praxyk.com:5000/'
@@ -41,19 +41,18 @@ def parse_args(argv) :
         " config file, one that contains a root token. If you don't have the root token, giving this flag will only " +\
         "cause everything to fail, depending on what you are doing")
     parser.add_argument('--script', action='store_true', help='This flag will tell the client script that you want to run ' +\
-    	'it in \'scripting\' mode, where this program will expect only commands to come from the standard input, so as not to ' +\
-    	'present the script with choices.')
+        'it in \'scripting\' mode, where this program will expect only commands to come from the standard input, so as not to ' +\
+        'present the script with choices.')
     return parser.parse_args()
 
 
 
 def get_input(desc, default=None) :
     desc = desc + ("" if not default else " default : (%s)" % str(default))
-    print desc
-    inp = sys.stdin.readline().strip()
+    inp = raw_input(PROMPT+desc).strip()
     inp = inp if inp else default
     while not inp :
-        inp = sys.stdin.readline().strip()
+        inp = raw_input(PROMPT+' '+desc).strip()
     return inp
 
 def get_passwd(desc = None) :
@@ -72,12 +71,12 @@ def get_input_choices(desc, choices) :
         print str(count) + ".)  " + str(x)
         count += 1
 
-    inp = None 
+    inp = None
     while not inp or not inp.isdigit() or (int(inp) <= 0 or int(inp) > len(choices)) :
         inp = sys.stdin.readline().strip()
         if not inp or not inp.isdigit() or (int(inp) <= 0 or int(inp) > len(choices)) :
             print "Incorrect Choice. Select Again."
-    
+
     return int(inp)-1
 
 # @info - gets a yes/no input from the user, returns true if user chose yes
@@ -121,7 +120,7 @@ def load_user() :
                 return login_user()
         else:
             answer = get_yes_no('Would you like to load user data from the Praxyk config file?')
-    
+
     if answer or SCRIPTING:
         try:
             config = ConfigParser.ConfigParser()
@@ -235,6 +234,8 @@ def display_result() :
 # @info - this attempts to parse a command the user has typed in by matching it with the ACTION_MAP
 # dictionary, and calls the appropriate function if the user's command is valid.
 def parse_command(command) :
+    if command == '' :
+        return
     if not command.action or command.action not in ACTIONS :
         sys.stderr.write('Must include a valid action (%s)\n' % ACTIONS)
         return
@@ -306,11 +307,10 @@ if __name__ == "__main__" :
         command_parser.add_argument('specifics', nargs='*', default=None, help='This (sometimes) optional argument contains the specifics' +\
             'of the user\'s command such as the transaction id of the transaction they want to display.')
 
-        command = get_input(PROMPT)
         while (True):
+            command = get_input('')
             parsed_command = command_parser.parse_args(command)
             parse_command(parsed_command)
-            command = get_input(PROMPT)
     except KeyboardInterrupt:
         print '\n^C received, exiting the Praxyk client script.'
         sys.exit(0)
