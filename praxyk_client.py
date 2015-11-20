@@ -7,7 +7,9 @@ import json
 import getpass
 import subprocess
 import ConfigParser
-import praxyk
+import traceback
+import pdb
+from libs.python.praxyk import Praxyk
 
 from os.path import expanduser
 
@@ -22,7 +24,7 @@ global SCRIPTING
 
 CONFIG_DIR = str(expanduser("~"))+'/.praxyk_client/'
 CLIENT_CONFIG_FILE = CONFIG_DIR + 'config'
-
+PROMPT = '=>'
 
 BASE_URL = 'http://127.0.0.1:5000/'
 # BASE_URL = 'http://api.praxyk.com:5000/'
@@ -53,9 +55,11 @@ def get_input(desc, default=None) :
     return inp
 
 def get_passwd(desc = None) :
+    if desc:
+        print desc
     inp = ""
     while not inp :
-        inp = getpass.getpass(desc).strip()
+        inp = getpass.getpass().strip()
     return inp
 
 def get_input_choices(desc, choices) :
@@ -108,11 +112,14 @@ def load_user() :
         if not os.path.isfile(CLIENT_CONFIG_FILE):
             answer = get_yes_no('Welcome to the Praxyk client script, we couldn\'t detect a configuration file, ' +\
             'do you have a Praxyk account already?')
-        if answer:
-            answer = get_yes_no('Would you like to load user data from the Praxyk config file?')
+            if not answer:
+                print 'No problem, we will have you up and running in no time!'
+                register_user()
+            else:
+                return login_user()
         else:
-            print 'No problem, we will have you up and running in no time!'
-            register_user()
+            answer = get_yes_no('Would you like to load user data from the Praxyk config file?')
+    
     if answer or SCRIPTING:
         try:
             config = ConfigParser.ConfigParser()
@@ -124,47 +131,48 @@ def load_user() :
             if not PRAXYK.login(auth_token=USER_AUTH):
                 print 'Unable to log in using credentials in config file, please log in with fresh credentials, '+\
                     'or type ^C to exit.'
-                login_user()
+                return login_user()
         except Exception:
-            sys.stderr.write('Unable to open the local configuration file.')
-            if scripting:
-                sys.stderr.write('Program is being run in scripting mode with invalid or nonexistant config file,\ncannot continue.')
+            sys.stderr.write('Unable to open the local configuration file.\n')
+            if SCRIPTING:
+                sys.stderr.write('Program is being run in scripting mode with invalid or nonexistant config file, cannot continue.\n')
                 sys.exit(1)
             else:
-                login_user()
+                return login_user()
     else:
-        login_user()
+        return login_user()
 
 # @info - this logs the user into the API service by submitting their username and password in return for a temporary access
 #         token. This token is stored in a hidden directory and can be loaded automatically when the user makes future requests.
 def login_user() :
     print 'Please enter your Praxyk login credentials'
-    USER_EMAIL = get_input('email: ')
-    USER_PASS = get_passwd('password:')
-    while not PRAXYK.login(username=USER_EMAIL, password=USER_PASS):
+    USER_EMAIL = get_input('Email: ')
+    USER_PASS = get_passwd()
+    while not PRAXYK.login(email=USER_EMAIL, password=USER_PASS):
         print 'Invalid username/password combination, please check your credentials and try again, or type ^C to exit'
-        USER_EMAIL = get_input('email: ')
-        USER_PASS = get_passwd('password:')
+        USER_EMAIL = get_input('Email: ')
+        USER_PASS = get_passwd()
     print 'Login successful!'
     return PRAXYK.user().get()
 
 def register_user() :
-    print 'Welcome to Praxyk'
-    print 'You are registering a new user account, if you do not wish to continue' +\
-        'type ^C at any time to exit.'
+    print 'Welcome to Praxyk!'
+    print 'You are registering a new user account, if you do not wish to continue,' +\
+        '\ntype ^C at any time to exit.'
     user_name = get_input('What is your name?')
     user_email = get_input('Please enter your email.')
-    user_pass1 = 'placeholder1'
-    user_pass2 = 'placeholder2'
+    user_pass1 = get_passwd('Please enter your password.')
+    user_pass2 = get_passwd('Please confirm your password.')
     while (user_pass1 != user_pass2) :
-        user_pass1 = get_input('Please enter your password.')
-        user_pass2 = get_input('Please confirm your password.')
+        print 'The passwords do not match, please enter matching passwords.'
+        user_pass1 = get_passwd('Please enter your password.')
+        user_pass2 = get_passwd('Please confirm your password.')
     if (not get_yes_no('Have you read and accepted our terms and conditions?\n' +\
         '(%s/terms_and_conditions.html)' % BASE_URL)) :
         print 'Feel free to come back if you change your mind.'
         exit_session()
     else :
-        user = PRAXYK.user(name=user_name,email=user_email).post():
+        user = PRAXYK.user(name=user_name,email=user_email).post()
         if user :
             print 'Welcome, %s!' % user_name
         else :
@@ -178,18 +186,47 @@ def exit_session() :
     print 'Thanks for using the Praxyk client script!'
     sys.exit(0)
 
-"""
 def change_password(user=None) :
+    pass
 
 def change_email(user=None) :
-
-def register_user(argv=None) :
+    pass
 
 def update_user(argv=None) :
+    pass
+
 def get_user(argv=None) :
+    pass
 
 def get_users(argv=None) :
-"""
+    pass
+
+def switch_user() :
+    pass
+
+def display_user() :
+    pass
+
+def apply_coupon() :
+    pass
+
+def begin_transaction() :
+    pass
+
+def cancel_transaction() :
+    pass
+
+def display_transactions() :
+    pass
+
+def display_transaction() :
+    pass
+
+def display_results() :
+    pass
+
+def display_result() :
+    pass
 
 # @info - this attempts to parse a command the user has typed in by matching it with the ACTION_MAP
 # dictionary, and calls the appropriate function if the user's command is valid.
@@ -203,7 +240,7 @@ def parse_command(command) :
     action_func = ACTION_MAP.get(command.action).get(command.noun, None)
     if not action_fun :
         sys.stderr.write('It looks like your input of \'%s\' is invalid or not yet implemented.' +\
-            ' If you feel this is an error, please contact the Praxyk team at %s' % ((command.action+' '+command.noun+' '+\
+            ' If you feel this is an error, please contact the Praxyk team at %s\n' % ((command.action+' '+command.noun+' '+\
                 +' '+command.specifics), BASE_URL))
         return
     res = action_func(argv=command.specifics)
@@ -242,17 +279,18 @@ ACTION_MAP = {
                     "users" : get_users } }
 
 ACTIONS = ACTION_MAP.keys()
-NOUNS = ACTION_MAP.values().keys()
+NOUNS = [ noun_func_pair.keys() for noun_func_pair in ACTION_MAP.values() ]
 
 # @info - main function, loops to get user input and calls
 # appropriate functions as per the user's command
 if __name__ == "__main__" :
     try:
         PRAXYK = Praxyk()
+        SCRIPTING = False
         args = parse_args(sys.argv)
         if args.root :
             CLIENT_CONFIG_FILE = CONFIG_DIR + 'root.config'
-        USER = load_user(CLIENT_CONFIG_FILE)
+        USER = load_user()
         print GREETING
 
         command_parser = argparse.ArgumentParser()
@@ -264,15 +302,15 @@ if __name__ == "__main__" :
         command_parser.add_argument('specifics', nargs='*', default=None, help='This (sometimes) optional argument contains the specifics' +\
             'of the user\'s command such as the transaction id of the transaction they want to display.')
 
-        command = get_input()
+        command = get_input(PROMPT)
         while (True):
             parsed_command = command_parser.parse_args(command)
             parse_command(parsed_command)
-            command = get_input()
+            command = get_input(PROMPT)
     except KeyboardInterrupt:
         print '\n^C received, exiting the Praxyk client script.'
         sys.exit(0)
     except Exception as e:
         print 'Something bad happened...\nPlease take the time to forward the following trace to help@praxyk.com, thanks!'
-        print e
+        traceback.print_exc()
         sys.exit(1)
