@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>QUnit Tests</title>
+	<link rel="stylesheet" href="qunit-git.css">
+	<script src="jquery.js"></script>
+	<script src="praxyk.js"></script>
+	<script src="login_details.js"></script>
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script src="qunit-git.js"></script>
+	<script>
+	
+		var token = null;
+		var user_id = null;
+	
+		TOKENS_POST(email,password,function(results){
+			token = results.token;
+			user_id = results.user.user_id;
+			QUnit.test("Successful Login", function(assert){
+				assert.notEqual(results,null,"Results Not Null");
+				assert.notEqual(results.token,null,"Valid Token");
+			});
+		});
+		
+		TOKENS_POST("","",function(results){
+			QUnit.test("Unsuccessful Login", function(assert){
+				assert.equal(results,null,"Results  Null");
+			});
+		});
+		
+		
+		
+		/*QUnit.test("Login was Successful", function( assert ) {
+			assert.notEqual(getToken(pr1), null, "Token was set!" );
+			assert.notEqual(pr1.getUID(), null, "User ID was set!");
+		});	
+
+		QUnit.test("Login was Unsuccessful", function( assert ) {
+			assert.equal(getToken(pr2), null, "Token wasn't set!" );
+			assert.equal(getUID(pr2), null, "User ID wasn't set!");
+		});	*/
+	</script>
+</body>
+</html>

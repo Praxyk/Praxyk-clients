@@ -1,1 +1,0 @@
-QUnit.test("",function(assert){});
