@@ -228,9 +228,6 @@ function OCR_POST(token,fileinputid,name,progress,callback){
 	});
 }
 
-/*function OCR_GET(){
-}*/
-
 function FACE_DETECTION_POST(token,fileinputid,name,progress,callback){
 	var input = $("#"+fileinputid).prop("files");
 	var face_detection_post_data = new FormData();
@@ -248,26 +245,75 @@ function FACE_DETECTION_POST(token,fileinputid,name,progress,callback){
 	});
 }
 
-/*function FACE_DETECTION_GET(){
-}
-
-function BAYES_SPAM_POST(){
-}
-
-function BAYES_SPAM_GET(){
+/*function BAYES_SPAM_POST(){
 }*/
 
-function TRANSACTIONS_GET_ALL(){
+function TRANSACTIONS_GET_ALL(token,userid,callback){
+	return api_call(URL('TRANSACTIONS')+"?token="+token+"&user_id="+userid+"&pagination=False","GET",null,null,null,function(result){
+		if(result!=null){
+			return callback($.parseJSON(result));
+		 }else{
+			 return callback(null);
+		 }
+	});
 }
 
-function TRANSACTIONS_GET_SINGLE(){
+function TRANSACTIONS_GET(token,userid,callback){
+	return api_call(URL('TRANSACTIONS')+"?token="+token+"&user_id="+userid,"GET",null,null,null,function(result){
+		if(result!=null){
+			return callback($.parseJSON(result));
+		 }else{
+			 return callback(null);
+		 }
+	});
 }
 
-function TRANSACTIONS_PUT(){
+function TRANSACTIONS_GET_PAGE(token,url,callback){
+	return api_call(url+"&token="+token,"GET",null,null,null,function(result){
+		if(result!=null){
+			return callback($.parseJSON(result));
+		 }else{
+			 return callback(null);
+		 }
+	});
 }
 
-function RESULTS_GET(){
+function TRANSACTIONS_GET_SINGLE(token,transactionid,callback){
+	return api_call(URL('TRANSACTIONS')+transactionid+"?token="+token,"GET",null,null,null,function(result){
+		if(result!=null){
+			return callback($.parseJSON(result));
+		 }else{
+			 return callback(null);
+		 }
+	});
 }
 
-function CUSTOM_CALL(){
+function TRANSACTIONS_PUT(token,transactionid,cancel,callback){
+	return api_call(URL('TRANSACTIONS')+transactionid+"?token="+token+"&cancel="+cancel,"PUT",null,null,null,function(result){
+		if(result!=null){
+			return callback($.parseJSON(result));
+		 }else{
+			 return callback(null);
+		 }
+	});
+}
+
+function RESULTS_GET(token,transactionid,callback){
+	return api_call(URL('RESULTS')+transactionid+"?token="+token,"GET",null,null,null,function(result){
+		if(result!=null){
+			return callback($.parseJSON(result));
+		 }else{
+			 return callback(null);
+		 }
+	});
+}
+
+function RESULTS_GET_PAGE(token,url,callback){
+	return api_call(URL('RESULTS')+"&token="+token,"GET",null,null,null,function(result){
+		if(result!=null){
+			return callback($.parseJSON(result));
+		 }else{
+			 return callback(null);
+		 }
+	});
 }
