@@ -1,4 +1,4 @@
-#!/usr/bin/env python                                                                                                                                
+#!/usr/bin/env python
 
 ## @auth John Allard, Nick Church, others
 ## @date Oct 2015
@@ -38,7 +38,7 @@ class PODBase(PraxykBase) :
                 return self.transaction
             return None
         except Exception as e :
-            raise e 
+            raise e
         return None
 
 

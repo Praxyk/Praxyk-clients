@@ -1,4 +1,4 @@
-#!/usr/bin/env python                                                                                                                                
+#!/usr/bin/env python
 
 ## @auth John Allard, Nick Church, others
 ## @date Oct 2015
@@ -18,7 +18,7 @@ from transactions import Transactions
 # @info - This class represents a single Praxyk user and the actions that can be made that are directly
 #         related to each user. That means this class can be used to set user info then post that info to
 #         create a new user, or you can just set the user_id and auth_token and use the get() function to
-#         get all of the rest of the info on a user. 
+#         get all of the rest of the info on a user.
 #         Deletions and updates are also supported through put() and delete()
 class User(PraxykBase) :
 
@@ -96,4 +96,4 @@ class User(PraxykBase) :
                     }
         base_dict.update(user_dict)
         return base_dict
-    
+

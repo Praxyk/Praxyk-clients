@@ -1,4 +1,4 @@
-#!/usr/bin/env python                                                                                                                                
+#!/usr/bin/env python
 
 ## @auth John Allard, Nick Church, others
 ## @date Oct 2015
@@ -22,7 +22,7 @@ from results import Results
 class Transaction(PraxykBase) :
 
     def __init__(self, trans_id=None, name=None, user_id=None, status=None, created_at=None,
-                 finished_at=None, command_url=None, service=None, model=None, uploads_total=None, 
+                 finished_at=None, command_url=None, service=None, model=None, uploads_total=None,
                  uploads_success=None, uploads_failed=None, size_total_KB=None, **kwargs) :
         super(Transaction, self).__init__(**kwargs)
         self.trans_id = trans_id
@@ -63,7 +63,7 @@ class Transaction(PraxykBase) :
                 return self
 
         except Exception as e:
-            raise PraxykException('Error: malformed response from GET request for transaction \'%s\'. Unable to load result dictionary' % self.trans_id, errors=response)
+            raise PraxykException('Error: malformed response from GET request for transaction \'%s\'. Unable to load result dictionary' % self.trans_id)
         return {}
 
 
@@ -75,15 +75,15 @@ class Transaction(PraxykBase) :
             time.sleep(interval)
             length += interval
             self.get()
-        return self.status in ['finished', 'failed'] 
+        return self.status in ['finished', 'failed']
 
 
     # @info - return the results object associated with this transction
     def results(self, *args, **kwargs) :
-        return Results(trans_id=self.trans_id, auth_token=self.auth_token, caller=self.caller, 
+        return Results(trans_id=self.trans_id, auth_token=self.auth_token, caller=self.caller,
                        local=self.local, port=self.port, *args, **kwargs)
 
-    def put(cancel=False):
+    def put(self, cancel=False):
         if self.trans_id and cancel:
             try:
                 payload = {'token' : self.auth_token, 'cancel' : cancel}
@@ -104,7 +104,7 @@ class Transaction(PraxykBase) :
                     self.size_total_KB = self.transaction.get('size_total_KB', None)
                     return self.transaction
             except:
-                raise PraxykException('Error with response received from call to \'put\', updating transaction \'%s\'' % trans_id, errors=response)
+                raise PraxykException('Error with response received from call to \'put\', updating transaction \'%s\'' % self.trans_id)
 
     def to_dict(self) :
         try:

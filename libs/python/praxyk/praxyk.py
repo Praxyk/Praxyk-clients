@@ -1,4 +1,4 @@
-#!/usr/bin/env python                                                                                                                                
+#!/usr/bin/env python
 
 ## @auth John Allard, Nick Church, others
 ## @date Oct 2015
@@ -14,11 +14,13 @@ from base import PraxykBase
 from user import User
 from transaction import Transaction
 from transactions import Transactions
+from result import Result
+from results import Results
 
 from pod import pod_ocr, pod_face_detect
 
 
-# @info - Main Praxyk class for the API. This class is used to manage one's account and perform 
+# @info - Main Praxyk class for the API. This class is used to manage one's account and perform
 #         most data-grabbing operations. User's log in through this class (either in the constructor
 #         or the login function), then can call the various get_* functions like get_user to get info
 #         on their account. To actually create users,`
@@ -63,7 +65,7 @@ class Praxyk(PraxykBase) :
                     local=self.local, port=self.port, *args, **kwargs)
 
     # @info - like the User function, this is a convenient factory class to instantiate a Transaction object with
-    #         the base attributes (auth_token, user_id, port, routes, etc) pre-set with the values from this 
+    #         the base attributes (auth_token, user_id, port, routes, etc) pre-set with the values from this
     #         existing object.
     def transaction(self, *args, **kwargs) :
         return Transaction(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port, *args, **kwargs)
