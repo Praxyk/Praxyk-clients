@@ -26,7 +26,7 @@ global SCRIPTING
 CONFIG_DIR = str(expanduser("~"))+'/.praxyk_client/'
 CLIENT_CONFIG_FILE = CONFIG_DIR + 'config'
 PROMPT = '=> '
-GREETING = '\nWelcome to the Praxyk command line client!\nPlease enter a command. (help displays a list of commands)\n'+\
+GREETING = '\nWelcome to the Praxyk command line client!\nPlease enter a command. (help displays a list of commands)\n'  +\
     'Type ^C at any time to quit.'
 
 #BASE_URL = 'http://127.0.0.1:5000/'
@@ -289,7 +289,7 @@ def begin_transaction(argv=None) :
             p = pod_bayes_spam.POD_BayesSpam(PRAXYK)
         res = p.post(file_names=query)
         return
-    except Exception as e:
+    except Exception as e :
         print e
         return
 
@@ -344,21 +344,28 @@ def display_transaction(argv=None) :
 def display_results(argv=None) :
     pass
 
-def display_result(argv=None) :
-    if argv is None :
-        trans_id = get_input('Please enter the transaction id of the result you wish to view: ')
-    else :
-        trans_id = argv
-    result = praxykResult(trans_id=trans_id).get()
-    if result is None :
-        print 'Unable to get the results of transaction with id %s, check to make sure the transaction ' +\
-            'id you have entered is correct.' % trans_id
-    else :
-        print 'Result:'
-        print_div()
-        print result
-        print_div()
-    return
+def display_result(argv) :
+    try :
+        if argv == '' :
+            trans_id = get_input('Please enter the transaction id of the result you wish to view: ')
+        else :
+            trans_id = argv
+        res = result.Result().get()
+        res.auth_token = PRAXYK.auth_token
+        res.trans_id = trans_id
+        print 'RESULT: ',res.to_dict()
+        if res is None :
+            print 'Unable to get the results of transaction with id %s, check to make sure the transaction ' +\
+                'id you have entered is correct.' % trans_id
+        else :
+            print 'Result:'
+            print_div()
+            print_dict(res.to_dict())
+            print_div()
+        return
+    except Exception as e :
+        print e
+        return
 
 # @info - this attempts to parse a command the user has typed in by matching it with the ACTION_MAP
 # dictionary, and calls the appropriate function if the user's command is valid.
