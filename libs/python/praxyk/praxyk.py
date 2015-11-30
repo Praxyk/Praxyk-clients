@@ -75,6 +75,12 @@ class Praxyk(PraxykBase) :
     def transactions(self, *args, **kwargs) :
         return Transactions(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port, *args, **kwargs)
 
+    def result(self, *args, **kwargs) :
+        return Result(auth_token=self.auth_token, user_id=None if not self.caller else self.caller.get('user_id', None), caller=self.caller, local=self.local, port=self.port, *args, **kwargs)
+
+    def results(self, *args, **kwargs) :
+        return Result(auth_token=self.auth_token, user_id=None if not self.caller else self.caller.get('user_id', None), caller=self.caller, local=self.local, port=self.port, *args, **kwargs)
+
     def pod(self, service, *args, **kwargs) :
         if service.lower() == 'ocr' :
             return pod_ocr.POD_OCR(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port, *args, **kwargs)

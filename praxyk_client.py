@@ -171,7 +171,7 @@ def login_user(argv=None) :
         USER_EMAIL = get_input('Email: ')
         USER_PASS = get_passwd()
     print 'Login successful!'
-    PRAXYK.user().get()
+    user = PRAXYK.user().get()
     config = ConfigParser.ConfigParser()
     configfile = open(CLIENT_CONFIG_FILE, 'w+')
     config.add_section('default_section')
@@ -236,10 +236,6 @@ def update_user(argv=None) :
     PRAXYK.user().get()
     return
 
-def get_user(argv=None) :
-    PRAXYK.user().get()
-    return
-
 def switch_user(argv=None) :
     return
 
@@ -249,15 +245,14 @@ def display_users(argv=None) :
     return
 
 def display_user(argv=None) :
-    get_user()
     user_dict = PRAXYK.user().to_dict()
     user_auth = user_dict.get('auth_token')
     user_dict = user_dict.get('caller')
     #print 'USER_DICT: ',user_dict
     print '\n\tUser information for %s:' % user_dict.get('name')
-    for key,value in user_dict.items() :
-        print '\t\t-',key.ljust(20),': ',str(value).ljust(15)
-    print '' # for formatting, yes I know it looks dumb but I just need one newline
+    print_div()
+    print_dict(user_dict)
+    print_div()
     pass
 
 def apply_coupon(argv=None) :
@@ -304,7 +299,6 @@ def cancel_transaction(argv=None) :
     return
 
 def display_transactions(argv=None) :
-    get_user()
     response = True
     transactions = PRAXYK.user().transactions().get()
     if len(transactions.to_dict()) > 0 :
@@ -318,7 +312,6 @@ def display_transactions(argv=None) :
     return
 
 def display_transaction(argv=None) :
-    get_user()
     trans_id = argv
     if trans_id is None :
         trans_id = get_input('Please enter the id of the transaction you would like to view: ')
@@ -342,7 +335,7 @@ def display_transaction(argv=None) :
         return
 
 def display_results(argv=None) :
-    pass
+    return
 
 def display_result(argv) :
     try :
@@ -350,15 +343,12 @@ def display_result(argv) :
             trans_id = get_input('Please enter the transaction id of the result you wish to view: ')
         else :
             trans_id = argv
-        res = result.Result().get()
-        res.auth_token = PRAXYK.auth_token
-        res.trans_id = trans_id
-        print 'RESULT: ',res.to_dict()
+        res = PRAXYK.result(trans_id=trans_id).get()
         if res is None :
             print 'Unable to get the results of transaction with id %s, check to make sure the transaction ' +\
                 'id you have entered is correct.' % trans_id
         else :
-            print 'Result:'
+            print '\tResult for transaction #%s:' % trans_id
             print_div()
             print_dict(res.to_dict())
             print_div()
@@ -406,8 +396,8 @@ def print_div(char='-') :
 def print_dict(dictionary) :
     for key,value in dictionary.items() :
         if key != 'auth_token' :
-            if type(value) is dict :
-                print '\t-',str(key).ljust(20)
+            if type(value) is dict and len(value) > 0:
+                print '\t$',str(key).ljust(20)
                 print_dict(value)
             else :
                 print '\t-',str(key).ljust(20),': ',str(value).ljust(20)

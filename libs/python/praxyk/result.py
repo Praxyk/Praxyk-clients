@@ -36,17 +36,17 @@ class Result(PraxykBase) :
         try :
             response = super(Result, self).get(self.RESULTS_ROUTE+str(self.trans_id), payload)
             if response :
-                page = response['page']
-                self.result = page.get('results', [])
-                if self.result and len(self.result) >= 1 :
-                    self.result = self.result[0]
+                print 'RESPOINSE',response,'\n'
+                self.result = response.get('transaction', None)
+                if len(self.result) >= 1 :
+                    self.page = response.get('page', None)
+                    self.service = self.result.get('service', None)
                     self.status = self.result.get('status', None)
                     self.created_at = self.result.get('created_at', None)
                     self.finished_at = self.result.get('finished_at', None)
-                    self.size_KB = self.result.get('size_KB', None)
+                    self.size_KB = self.result.get('size_total_KB', None)
                     self.item_name = self.result.get('item_name', None)
                     self.item_number = self.result.get('item_number', None)
-                    self.prediction = self.result.get('prediction', None)
                     return self
         except Exception, e :
             sys.stderr.write(str(e))
@@ -57,15 +57,16 @@ class Result(PraxykBase) :
     def to_dict(self) :
         base_dict = super(Result, self).to_dict()
         result_dict = {
+                'item_name' : self.item_name,
+                'service' : self.service,
                 'status' : self.status,
                 'trans_id' : self.trans_id,
                 'user_id' : self.user_id,
                 'created_at' : self.created_at,
                 'finished_at' : self.finished_at,
                 'size_KB' : self.size_KB,
-                'item_name' : self.item_name,
                 'item_number' : self.item_number,
-                'prediction' : self.prediction
+                'prediction' : self.page
                 }
         base_dict.update(result_dict)
         return base_dict
