@@ -68,13 +68,16 @@ class Transaction(PraxykBase) :
 
 
     # @info - wait for the transaction to either finish or fail, sleeps for interval seconds, timesout at timeout seconds
-    def spin(self, interval=1, timeout=60) :
+    #         The optional argument @callback is a function that we call during each interval with the status of the transction,
+    #         so the function should take one argument which is the transction
+    def spin(self, interval=1, timeout=60, callback=None) :
         length = 0
         if interval <= 0 : return False
         while self.status in ['active', 'new'] and length <= timeout:
             time.sleep(interval)
             length += interval
             self.get()
+            if callback : callback(self)
         return self.status in ['finished', 'failed'] 
 
 
