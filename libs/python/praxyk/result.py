@@ -36,7 +36,6 @@ class Result(PraxykBase) :
         try :
             response = super(Result, self).get(self.RESULTS_ROUTE+str(self.trans_id), payload)
             if response :
-                print 'RESPOINSE',response,'\n'
                 self.result = response.get('transaction', None)
                 if len(self.result) >= 1 :
                     self.page = response.get('page', None)

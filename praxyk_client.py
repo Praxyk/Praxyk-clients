@@ -335,7 +335,16 @@ def display_transaction(argv=None) :
         return
 
 def display_results(argv=None) :
-    return
+    try :
+        results = PRAXYK.results().get()
+        print '\tResults:'
+        print_div()
+        print_dict(results.to_dict())
+        print_div()
+        return
+    except Exception as e :
+        print e
+        return
 
 def display_result(argv) :
     try :
