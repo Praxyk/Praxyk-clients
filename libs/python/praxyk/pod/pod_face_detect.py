@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python                                                                                                                                
 
 ## @auth John Allard, Nick Church, others
 ## @date Oct 2015
@@ -15,12 +15,10 @@ from pod_base import PODBase
 from results import Results
 
 
-# @info - this class is used to access the optical-character-recognition route of the POD service.
-#         It allows users to upload files to the API to perform OCR upon.
-class POD_OCR(PODBase) :
+class POD_FaceDetect(PODBase) :
 
     def __init__(self, file_names=[], *args, **kwargs) :
-        super(POD_OCR, self).__init__(*args, **kwargs)
+        super(POD_FaceDetect, self).__init__(*args, **kwargs)
         self.file_names = file_names
         self.transaction = None
 
@@ -40,12 +38,12 @@ class POD_OCR(PODBase) :
 
             # PODBase super class automatically turns the result from the API into a praxyk.Transaction
             # object for us to use
-            new_trans = super(POD_OCR, self).post(self.POD_OCR_ROUTE, payload, files=files, **kwargs)
-            if new_trans :
+            new_trans = super(POD_FaceDetect, self).post(self.POD_FACE_DETECT_ROUTE, payload, files=files, **kwargs)
+            if new_trans :    
                 self.transaction = new_trans
                 return self.transaction
             return None
-        except Exception as e :
+        except Exception as e : 
             raise e
         return None
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python                                                                                                                                
+#!/usr/bin/env python
 
 ## @auth John Allard, Nick Church, others
 ## @date Oct 2015
@@ -47,11 +47,9 @@ class Results(Paginated) :
             if not self.results_raw : return None
             for result in self.results_raw :
                 self.results.append(Result(auth_token=self.auth_token, caller=self.caller,
-                                           local=self.local, port=self.port, 
-                                           trans_id=self.trans_id, user_id=self.user_id, **result)
-                                        )
+                                           local=self.local, port=self.port,
+                                           trans_id=self.trans_id, user_id=self.caller.get('user_id', None), **result))
             return self
-            # return self.results_raw
         return None
 
 

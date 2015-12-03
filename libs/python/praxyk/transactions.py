@@ -1,4 +1,4 @@
-#!/usr/bin/env python                                                                                                                                
+#!/usr/bin/env python
 
 ## @auth John Allard, Nick Church, others
 ## @date Oct 2015
@@ -46,10 +46,10 @@ class Transactions(Paginated) :
                     self.transactions_raw = response['page'].get('transactions', None)
                 else :
                     self.transactions_raw = response.get('transactions', None)
-                if not self.transactions_raw : 
+                if not self.transactions_raw :
                     return None
                 for trans in self.transactions_raw :
-                    self.transactions.append(Transaction(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port,  **trans))
+                    self.transactions.append(Transaction(auth_token=self.auth_token, caller=self.caller, local=self.local, port=self.port, **trans).get().to_dict())
                 return self
                 # return self.transactions_raw
         except Exception as e :

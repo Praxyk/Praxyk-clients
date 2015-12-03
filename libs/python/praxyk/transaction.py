@@ -1,4 +1,4 @@
-#!/usr/bin/env python                                                                                                                                
+#!/usr/bin/env python
 
 ## @auth John Allard, Nick Church, others
 ## @date Oct 2015
@@ -6,7 +6,7 @@
 ## @license MIT
 
 
-import os, sys, json, requests
+import os, sys, json, requests, time
 import subprocess, argparse, getpass
 import datetime as dt
 from praxyk_exception import PraxykException
@@ -22,7 +22,7 @@ from results import Results
 class Transaction(PraxykBase) :
 
     def __init__(self, trans_id=None, name=None, user_id=None, status=None, created_at=None,
-                 finished_at=None, command_url=None, service=None, model=None, uploads_total=None, 
+                 finished_at=None, command_url=None, service=None, model=None, uploads_total=None,
                  uploads_success=None, uploads_failed=None, size_total_KB=None, **kwargs) :
         super(Transaction, self).__init__(**kwargs)
         self.trans_id = trans_id
@@ -61,18 +61,32 @@ class Transaction(PraxykBase) :
                 self.uploads_failed = self.transaction.get('uploads_failed', None)
                 self.size_total_KB = self.transaction.get('size_total_KB', None)
                 return self
-                # return self.transaction
 
         except Exception as e:
-            raise PraxykException('Error: malformed response from GET request for transaction \'%s\'. Unable to load result dictionary' % self.trans_id, errors=response)
+            raise PraxykException('Error: malformed response from GET request for transaction \'%s\'. Unable to load result dictionary' % self.trans_id)
         return {}
+
+
+    # @info - wait for the transaction to either finish or fail, sleeps for interval seconds, timesout at timeout seconds
+    #         The optional argument @callback is a function that we call during each interval with the status of the transction,
+    #         so the function should take one argument which is the transction
+    def spin(self, interval=1, timeout=60, callback=None) :
+        length = 0
+        if interval <= 0 : return False
+        while self.status in ['active', 'new'] and length <= timeout:
+            time.sleep(interval)
+            length += interval
+            self.get()
+            if callback : callback(self)
+        return self.status in ['finished', 'failed'] 
+
 
     # @info - return the results object associated with this transction
     def results(self, *args, **kwargs) :
-        return Results(trans_id=self.trans_id, auth_token=self.auth_token, caller=self.caller, 
+        return Results(trans_id=self.trans_id, auth_token=self.auth_token, caller=self.caller,
                        local=self.local, port=self.port, *args, **kwargs)
 
-    def put(cancel=False):
+    def put(self, cancel=False):
         if self.trans_id and cancel:
             try:
                 payload = {'token' : self.auth_token, 'cancel' : cancel}
@@ -93,7 +107,7 @@ class Transaction(PraxykBase) :
                     self.size_total_KB = self.transaction.get('size_total_KB', None)
                     return self.transaction
             except:
-                raise PraxykException('Error with response received from call to \'put\', updating transaction \'%s\'' % trans_id, errors=response)
+                raise PraxykException('Error with response received from call to \'put\', updating transaction \'%s\'' % self.trans_id)
 
     def to_dict(self) :
         try:
